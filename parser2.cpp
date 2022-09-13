@@ -1,5 +1,6 @@
 #include <string>
 #include <memory>
+#include <iostream>
 #include "token.h"
 #include "ast.h"
 #include "exceptions.h"
@@ -27,6 +28,7 @@
 // F -> number
 // F -> ident
 // F -> ( E )
+// c = (a * 4 < 55) && (b == 16 || b >= 9 + 13);
 
 
 Parser2::Parser2(Lexer *lexer_to_adopt)
@@ -62,13 +64,16 @@ Node *Parser2::parse_Stmt() {
     std::unique_ptr<Node> s(new Node(AST_STATEMENT));
 
     Node *next_tok = m_lexer->peek();
+
     if (next_tok == nullptr) {
         SyntaxError::raise(m_lexer->get_current_loc(), "Unexpected end of input looking for statement");
 
     } else if (next_tok->get_tag() == TOK_VAR) {
         // Stmt -> ^ var ident ;
         s->append_kid(parse_var());
-        s->append_kid(parse_ident());
+        expect_and_discard(TOK_SEMICOLON);
+        return s.release();
+
     }
     // Stmt -> ^ E ;
     s->append_kid(parse_A());
@@ -81,10 +86,11 @@ Node *Parser2::parse_Stmt() {
 Node *Parser2::parse_A() {
     // A → ^ ident = A
     // A → ^ L
-    Node *next_tok = m_lexer->peek();
-
+    Node *next_tok = m_lexer->peek(1);
+    Node *next_next_tok = m_lexer->peek(2);
     int next_tok_tag = next_tok->get_tag();
-    if (next_tok_tag == TOK_IDENTIFIER){
+    int next_next_tok_tag = next_next_tok->get_tag();
+    if (next_tok_tag == TOK_IDENTIFIER && next_next_tok_tag == TOK_ASSIGN){
         return parse_assign();
     } else {
         return parse_L();
@@ -100,19 +106,21 @@ Node *Parser2::parse_L(){
     Node *next_tok = m_lexer->peek();
 
     if (next_tok != nullptr) {
-        //L    → R || R
-        //L    → R && R
-        Node * lhs = parse_R();
+        if (next_tok->get_tag() == TOK_AND || next_tok->get_tag() == TOK_OR) {
+            //L    → R || R
+            //L    → R && R
+            Node *lhs = parse_R();
 
-        int tag = next_tok->get_tag();
+            int tag = next_tok->get_tag();
 
-        int ast_tag = tag == TOK_AND ? AST_AND : AST_OR;
-        std::unique_ptr<Node> op(expect(static_cast<enum TokenKind>(ast_tag)));
-        Node * rhs = parse_R();
-        op->append_kid(lhs);
-        op->append_kid(rhs);
-        op->set_str(next_tok->get_str());
-        op->set_loc(next_tok->get_loc());
+            int ast_tag = tag == TOK_AND ? AST_AND : AST_OR;
+            std::unique_ptr<Node> op(expect(static_cast<enum TokenKind>(ast_tag)));
+            Node *rhs = parse_R();
+            op->append_kid(lhs);
+            op->append_kid(rhs);
+            op->set_str(next_tok->get_str());
+            op->set_loc(next_tok->get_loc());
+        }
 
     }
 
@@ -130,17 +138,18 @@ Node *Parser2::parse_R() {
     //R    → E != E
     //R    → E
 
-    Node *next_tok = m_lexer->peek();
+    Node *next_tok = m_lexer->peek(2);
+    //std::cout << next_tok->get_tag() << std::endl;
 
-    if (next_tok != nullptr) {
+    if (next_tok->get_tag() < 18 && next_tok->get_tag() > 11) {
         //R    → ^E op E
-        Node * lhs = parse_E();
+        Node *lhs = parse_E();
         //R    → E ^op E
         std::unique_ptr<Node> tok(expect(static_cast<enum TokenKind>(next_tok->get_tag())));
         int ast_tag = next_tok->get_tag() + 2000;
         std::unique_ptr<Node> ast(new Node(ast_tag));
         //R    → E op ^E
-        Node * rhs = parse_E();
+        Node *rhs = parse_E();
         ast->append_kid(lhs);
         ast->append_kid(rhs);
         ast->set_str(tok->get_str());
@@ -244,7 +253,7 @@ Node *Parser2::parse_TPrime(Node *ast_) {
 Node *Parser2::parse_F() {
     // F -> ^ number
     // F -> ^ ident
-    // F -> ^ ( E )
+    // F -> ^ ( A )
 
     Node *next_tok = m_lexer->peek();
     if (next_tok == nullptr) {
@@ -262,7 +271,7 @@ Node *Parser2::parse_F() {
         ast->set_loc(tok->get_loc());
         return ast.release();
     } else if (tag == TOK_LPAREN) {
-        // F -> ^ ( E )
+        // F -> ^ ( A )
         expect_and_discard(TOK_LPAREN);
         std::unique_ptr<Node> ast(parse_A());
         expect_and_discard(TOK_RPAREN);
@@ -275,8 +284,13 @@ Node *Parser2::parse_F() {
 Node *Parser2::parse_assign() {
     // A  → ^ ident = A
     Node *lhs = parse_ident();
-    expect_and_discard(TOK_EQUAL);
+
+    //std::cout << m_lexer->peek()->get_tag() << std::endl;
+    //std::cout << "bang" << std::endl;
+
+    expect_and_discard(TOK_ASSIGN);
     // A    → ident = ^ A
+
     Node *rhs = parse_A();
 
     std::unique_ptr<Node> ast(new Node(AST_ASSIGN));
@@ -290,9 +304,10 @@ Node *Parser2::parse_assign() {
 Node *Parser2::parse_var() {
     // STMT -> ^ var ident;
     std::unique_ptr<Node> tok(expect(static_cast<enum TokenKind>(TOK_VAR)));
-    std::unique_ptr<Node> ast(new Node(AST_VAR));
+    std::unique_ptr<Node> ast(new Node(AST_VARDEF));
     ast->set_str(tok->get_str());
     ast->set_loc(tok->get_loc());
+    ast->append_kid(parse_ident());
 
     return ast.release();
 }
@@ -311,9 +326,11 @@ Node *Parser2::parse_ident() {
 
 Node *Parser2::expect(enum TokenKind tok_kind) {
     std::unique_ptr<Node> next_terminal(m_lexer->next());
+    std::cout << "Parser consumes: " << next_terminal->get_tag() << ", Expects: " << tok_kind << std::endl;
     if (next_terminal->get_tag() != tok_kind) {
         SyntaxError::raise(next_terminal->get_loc(), "Unexpected token '%s'", next_terminal->get_str().c_str());
     }
+
     return next_terminal.release();
 }
 

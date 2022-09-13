@@ -107,8 +107,7 @@ Node *Lexer::read_token() {
 
     std::string lexeme;
     lexeme.push_back(char(c));
-    std::cout << (char) c << std::endl;
-
+    std::cout << "Lexer reads: " << (char) c << std::endl;
 
     if (isalpha(c)) {
         Node *tok = read_continued_token(TOK_IDENTIFIER, lexeme, line, col, isalnum);
@@ -159,6 +158,7 @@ Node *Lexer::read_token() {
 // Helper function to create a Node object to represent a token.
 Node *Lexer::token_create(enum TokenKind kind, const std::string &lexeme, int line, int col) {
     Node *token = new Node(kind, lexeme);
+    std::cout << "Lexer Creates: " << lexeme << std::endl;
     Location source_info(m_filename, line, col);
     token->set_loc(source_info);
     return token;
