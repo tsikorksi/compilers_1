@@ -38,7 +38,14 @@ private:
 
     Node *parse_var();
 
+
+    Node *parse_L();
+
     Node *parse_A();
+
+    Node *parse_assign();
+
+    Node *parse_R();
 };
 
 #endif // PARSER2_H

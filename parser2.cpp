@@ -1,12 +1,9 @@
-#include <cassert>
-#include <map>
 #include <string>
 #include <memory>
 #include "token.h"
 #include "ast.h"
 #include "exceptions.h"
 #include "parser2.h"
-#include "environment.h"
 
 ////////////////////////////////////////////////////////////////////////
 // Parser2 implementation
@@ -30,6 +27,7 @@
 // F -> number
 // F -> ident
 // F -> ( E )
+
 
 Parser2::Parser2(Lexer *lexer_to_adopt)
         : m_lexer(lexer_to_adopt)
@@ -69,7 +67,8 @@ Node *Parser2::parse_Stmt() {
 
     } else if (next_tok->get_tag() == TOK_VAR) {
         // Stmt -> ^ var ident ;
-        parse_var();
+        s->append_kid(parse_var());
+        s->append_kid(parse_ident());
     }
     // Stmt -> ^ E ;
     s->append_kid(parse_A());
@@ -80,8 +79,79 @@ Node *Parser2::parse_Stmt() {
 
 
 Node *Parser2::parse_A() {
-    return nullptr;
+    // A → ^ ident = A
+    // A → ^ L
+    Node *next_tok = m_lexer->peek();
+
+    int next_tok_tag = next_tok->get_tag();
+    if (next_tok_tag == TOK_IDENTIFIER){
+        return parse_assign();
+    } else {
+        return parse_L();
+    }
 }
+
+Node *Parser2::parse_L(){
+    //L    → R || R
+    //L    → R && R
+    //L    → R
+
+
+    Node *next_tok = m_lexer->peek();
+
+    if (next_tok != nullptr) {
+        //L    → R || R
+        //L    → R && R
+        Node * lhs = parse_R();
+
+        int tag = next_tok->get_tag();
+
+        int ast_tag = tag == TOK_AND ? AST_AND : AST_OR;
+        std::unique_ptr<Node> op(expect(static_cast<enum TokenKind>(ast_tag)));
+        Node * rhs = parse_R();
+        op->append_kid(lhs);
+        op->append_kid(rhs);
+        op->set_str(next_tok->get_str());
+        op->set_loc(next_tok->get_loc());
+
+    }
+
+    //L    → R
+    return parse_R();
+
+}
+
+Node *Parser2::parse_R() {
+    //R    → E < E
+    //R    → E <= E
+    //R    → E > E
+    //R    → E >= E
+    //R    → E == E
+    //R    → E != E
+    //R    → E
+
+    Node *next_tok = m_lexer->peek();
+
+    if (next_tok != nullptr) {
+        //R    → ^E op E
+        Node * lhs = parse_E();
+        //R    → E ^op E
+        std::unique_ptr<Node> tok(expect(static_cast<enum TokenKind>(next_tok->get_tag())));
+        int ast_tag = next_tok->get_tag() + 2000;
+        std::unique_ptr<Node> ast(new Node(ast_tag));
+        //R    → E op ^E
+        Node * rhs = parse_E();
+        ast->append_kid(lhs);
+        ast->append_kid(rhs);
+        ast->set_str(tok->get_str());
+        ast->set_loc(tok->get_loc());
+        return ast.release();
+    }
+
+    //R    → E
+    return parse_E();
+}
+
 
 Node *Parser2::parse_E() {
     // E -> ^ T E'
@@ -194,7 +264,7 @@ Node *Parser2::parse_F() {
     } else if (tag == TOK_LPAREN) {
         // F -> ^ ( E )
         expect_and_discard(TOK_LPAREN);
-        std::unique_ptr<Node> ast(parse_E());
+        std::unique_ptr<Node> ast(parse_A());
         expect_and_discard(TOK_RPAREN);
         return ast.release();
     } else {
@@ -202,15 +272,40 @@ Node *Parser2::parse_F() {
     }
 }
 
+Node *Parser2::parse_assign() {
+    // A  → ^ ident = A
+    Node *lhs = parse_ident();
+    expect_and_discard(TOK_EQUAL);
+    // A    → ident = ^ A
+    Node *rhs = parse_A();
+
+    std::unique_ptr<Node> ast(new Node(AST_ASSIGN));
+    ast->set_loc(lhs->get_loc());
+    ast->set_str("=");
+    ast->append_kid(lhs);
+    ast->append_kid(rhs);
+    return ast.release();
+}
+
 Node *Parser2::parse_var() {
     // STMT -> ^ var ident;
+    std::unique_ptr<Node> tok(expect(static_cast<enum TokenKind>(TOK_VAR)));
+    std::unique_ptr<Node> ast(new Node(AST_VAR));
+    ast->set_str(tok->get_str());
+    ast->set_loc(tok->get_loc());
 
-    return parse_ident();
+    return ast.release();
 }
 
 
 Node *Parser2::parse_ident() {
     // STMT -> var ^ ident;
+
+    std::unique_ptr<Node> tok(expect(static_cast<enum TokenKind>(TOK_IDENTIFIER)));
+    std::unique_ptr<Node> ast(new Node(AST_VARREF));
+    ast->set_str(tok->get_str());
+    ast->set_loc(tok->get_loc());
+    return ast.release();
 
 }
 
