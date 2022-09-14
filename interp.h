@@ -19,6 +19,8 @@ public:
 
 private:
   // TODO: private member functions
+
+    void search_for_semantic(Node *ast, Environment test_env);
 };
 
 #endif // INTERP_H

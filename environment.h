@@ -17,13 +17,16 @@ private:
 
 public:
   Environment(Environment *parent = nullptr);
+  Environment();
   ~Environment();
 
   // TODO: add member functions allowing lookup, definition, and assignment
 
     int get_variable(const std::string& identifier, const Location &loc);
 
-    void new_variable(const std::string& identifier, int value, const Location &loc);
+    void new_variable(const std::string &identifier, const Location &loc);
+
+    void set_variable(const std::string &identifier, int value);
 };
 
 #endif // ENVIRONMENT_H
