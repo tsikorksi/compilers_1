@@ -116,6 +116,7 @@ Node *Lexer::read_token() {
         }
         return tok;
     } else if (isdigit(c)) {
+        std::cout << "val" << std::endl;
         return read_continued_token(TOK_INTEGER_LITERAL, lexeme, line, col, isdigit);
     } else {
         switch (c) {
@@ -137,6 +138,7 @@ Node *Lexer::read_token() {
             case ';':
                 return token_create(TOK_SEMICOLON, lexeme, line, col);
             case '<':
+                std::cout << "less" << std::endl;
                 return read_multi_less(lexeme, line, col);
             case '>':
                 return read_multi_greater(lexeme, line, col);
@@ -204,6 +206,8 @@ Node *Lexer::read_multi_less(const std::string &lexeme, int line, int col) {
     } else {
         kind = TOK_LESS;
     }
+
+    std::cout << "less" << std::endl;
 
     return token_create(kind, lexeme, line, col);
 }
