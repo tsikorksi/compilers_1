@@ -125,6 +125,9 @@ Node *Parser2::parse_L(){
             op->append_kid(rhs);
             op->set_str(next_tok->get_str());
             op->set_loc(next_tok->get_loc());
+            op->set_tag(ast_tag);
+
+            return op.release();
         }
 
     }
@@ -154,7 +157,7 @@ Node *Parser2::parse_R() {
         //R    → ^E op E
         //R    → E ^op E
         std::unique_ptr<Node> tok(expect(static_cast<enum TokenKind>(next_tok->get_tag())));
-        int ast_tag = next_tok->get_tag() + 2000;
+        int ast_tag = next_tok->get_tag() + 1999;
         std::unique_ptr<Node> ast(new Node(ast_tag));
         //R    → E op ^E
         Node *rhs = parse_E();
