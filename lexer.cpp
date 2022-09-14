@@ -109,7 +109,6 @@ Node *Lexer::read_token() {
 
     std::string lexeme;
     lexeme.push_back(char(c));
-    std::cout << (char) c << std::endl;
     if (isalpha(c)) {
         Node *tok = read_continued_token(TOK_IDENTIFIER, lexeme, line, col, isalnum);
         if (tok->get_str() == "var") {
@@ -232,6 +231,14 @@ Node *Lexer::read_multi_greater(const std::string &lexeme, int line, int col) {
 
 std::string Lexer::node_tag_to_string(int tag) {
     switch (tag) {
+        case TOK_IDENTIFIER:
+            return "VARREF";
+        case TOK_VAR:
+            return "VARDEF";
+        case TOK_ASSIGN:
+            return "ASSIGN";
+        case TOK_INTEGER_LITERAL:
+            return "INT_LITERAL";
         case TOK_PLUS:
             return "ADD";
         case TOK_MINUS:
@@ -240,16 +247,14 @@ std::string Lexer::node_tag_to_string(int tag) {
             return "MULTIPLY";
         case TOK_DIVIDE:
             return "DIVIDE";
-        case TOK_IDENTIFIER:
-            return "VARREF";
-        case TOK_INTEGER_LITERAL:
-            return "INT_LITERAL";
-        case TOK_ASSIGN:
-            return "ASSIGN";
-        case TOK_AND:
-            return "AND";
+        case TOK_LPAREN:
+            return "(";
+        case TOK_RPAREN:
+            return ")";
         case TOK_OR:
             return "OR";
+        case TOK_AND:
+            return "AND";
         case TOK_LESS:
             return "LESS";
         case TOK_LESSEQUAL:
