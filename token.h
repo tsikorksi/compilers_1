@@ -24,7 +24,6 @@ enum TokenKind {
   TOK_EQUAL,
   TOK_NOTEQUAL,
   TOK_SEMICOLON,
-  // TODO: add members for additional kinds of tokens
 };
 
 #endif // TOKEN_H

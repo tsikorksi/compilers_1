@@ -107,7 +107,6 @@ Node *Lexer::read_token() {
 
     std::string lexeme;
     lexeme.push_back(char(c));
-    std::cout << "Lexer reads: " << (char) c << std::endl;
 
     if (isalpha(c)) {
         Node *tok = read_continued_token(TOK_IDENTIFIER, lexeme, line, col, isalnum);
@@ -116,7 +115,6 @@ Node *Lexer::read_token() {
         }
         return tok;
     } else if (isdigit(c)) {
-        std::cout << "val" << std::endl;
         return read_continued_token(TOK_INTEGER_LITERAL, lexeme, line, col, isdigit);
     } else {
         switch (c) {
@@ -138,7 +136,6 @@ Node *Lexer::read_token() {
             case ';':
                 return token_create(TOK_SEMICOLON, lexeme, line, col);
             case '<':
-                std::cout << "less" << std::endl;
                 return read_multi_less(lexeme, line, col);
             case '>':
                 return read_multi_greater(lexeme, line, col);
@@ -160,7 +157,7 @@ Node *Lexer::read_token() {
 // Helper function to create a Node object to represent a token.
 Node *Lexer::token_create(enum TokenKind kind, const std::string &lexeme, int line, int col) {
     Node *token = new Node(kind, lexeme);
-    std::cout << "Lexer Creates: " << lexeme << std::endl;
+    std::cout << "Lexer Creates: " << node_tag_to_string(token->get_tag())<< ", " << lexeme << std::endl;
     Location source_info(m_filename, line, col);
     token->set_loc(source_info);
     return token;
@@ -207,7 +204,6 @@ Node *Lexer::read_multi_less(const std::string &lexeme, int line, int col) {
         kind = TOK_LESS;
     }
 
-    std::cout << "less" << std::endl;
 
     return token_create(kind, lexeme, line, col);
 }
@@ -224,4 +220,41 @@ Node *Lexer::read_multi_greater(const std::string &lexeme, int line, int col) {
     return token_create(kind, lexeme, line, col);
 }
 
-// TODO: implement additional member functions if necessary
+std::string Lexer::node_tag_to_string(int tag) {
+    switch (tag) {
+        case TOK_PLUS:
+            return "ADD";
+        case TOK_MINUS:
+            return "SUB";
+        case TOK_TIMES:
+            return "MULTIPLY";
+        case TOK_DIVIDE:
+            return "DIVIDE";
+        case TOK_IDENTIFIER:
+            return "VARREF";
+        case TOK_INTEGER_LITERAL:
+            return "INT_LITERAL";
+        case TOK_ASSIGN:
+            return "ASSIGN";
+        case TOK_AND:
+            return "AND";
+        case TOK_OR:
+            return "OR";
+        case TOK_LESS:
+            return "LESS";
+        case TOK_LESSEQUAL:
+            return "LESSEQUAL";
+        case TOK_GREATER:
+            return "GREATER";
+        case TOK_GREATEREQUAL:
+            return "GREATEREQUAL";
+        case TOK_EQUAL:
+            return "EQUAL";
+        case TOK_NOTEQUAL:
+            return "NOT";
+        case TOK_SEMICOLON:
+            return ";";
+        default:
+            return "";
+    }
+}
