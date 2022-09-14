@@ -81,6 +81,8 @@ void Lexer::fill(int how_many) {
     assert(how_many > 0);
     while (!m_eof && int(m_lookahead.size()) < how_many) {
         Node *tok = read_token();
+        //std::cout << "Lexer Creates: " << node_tag_to_string(tok->get_tag())<< ", " << tok->get_str() << std::endl;
+
         if (tok != nullptr) {
             m_lookahead.push_back(tok);
         }
@@ -140,13 +142,13 @@ Node *Lexer::read_token() {
             case '>':
                 return read_multi_greater(lexeme, line, col);
             case '|':
-                read();
+                next();
                 return token_create(TOK_OR, lexeme, line, col);
             case '&':
-                read();
+                next();
                 return token_create(TOK_AND, lexeme, line, col);
             case '!':
-                read();
+                next();
                 return token_create(TOK_NOTEQUAL, lexeme, line, col);
             default:
                 SyntaxError::raise(get_current_loc(), "Unrecognized character '%c'", c);
@@ -157,7 +159,6 @@ Node *Lexer::read_token() {
 // Helper function to create a Node object to represent a token.
 Node *Lexer::token_create(enum TokenKind kind, const std::string &lexeme, int line, int col) {
     Node *token = new Node(kind, lexeme);
-    std::cout << "Lexer Creates: " << node_tag_to_string(token->get_tag())<< ", " << lexeme << std::endl;
     Location source_info(m_filename, line, col);
     token->set_loc(source_info);
     return token;
@@ -187,11 +188,11 @@ Node *Lexer::read_multi_equal(const std::string &lexeme, int line, int col) {
     enum TokenKind kind;
 
     if (peek(1)->get_str()[0] == '=') {
+        next();
         kind = TOK_EQUAL;
     } else {
         kind = TOK_ASSIGN;
     }
-
     return token_create(kind, lexeme, line, col);
 }
 
@@ -199,11 +200,11 @@ Node *Lexer::read_multi_less(const std::string &lexeme, int line, int col) {
     enum TokenKind kind;
 
     if (peek(1)->get_str()[0] == '=') {
+        next();
         kind = TOK_LESSEQUAL;
     } else {
         kind = TOK_LESS;
     }
-
 
     return token_create(kind, lexeme, line, col);
 }

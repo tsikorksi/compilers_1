@@ -212,7 +212,7 @@ Node *Parser2::parse_EPrime(Node *ast_) {
             return parse_EPrime(ast.release());
         }
     }
-
+    std::cout << "epsilon" << std::endl;
     // E' -> ^ epsilon
     // No more additive operators, so just return the completed AST
     return ast.release();
@@ -261,6 +261,7 @@ Node *Parser2::parse_TPrime(Node *ast_) {
         }
     }
 
+    std::cout << "epsilon" << std::endl;
     // T' -> ^ epsilon
     // No more multiplicative operators, so just return the completed AST
 
