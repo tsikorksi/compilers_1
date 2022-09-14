@@ -1,6 +1,7 @@
 #include <string>
 #include <memory>
 #include <iostream>
+#include <cassert>
 #include "token.h"
 #include "ast.h"
 #include "exceptions.h"
@@ -114,7 +115,7 @@ Node *Parser2::parse_L() {
 
             int tag = next_tok->get_tag();
 
-            int ast_tag = tag == TOK_AND ? AST_AND : AST_OR;
+            int ast_tag = tok_to_ast(static_cast<TokenKind>(tag));
             std::unique_ptr<Node> op(expect(static_cast<enum TokenKind>(tag)));
             Node *rhs = parse_R();
             op->append_kid(lhs);
@@ -151,7 +152,7 @@ Node *Parser2::parse_R() {
         //R    → ^E op E
         //R    → E ^op E
         std::unique_ptr<Node> tok(expect(static_cast<enum TokenKind>(next_tok->get_tag())));
-        int ast_tag = next_tok->get_tag() + 2000;
+        int ast_tag = tok_to_ast(static_cast<TokenKind>(next_tok->get_tag()));
         std::unique_ptr<Node> ast(new Node(ast_tag));
         //R    → E op ^E
         Node *rhs = parse_E();
@@ -199,7 +200,7 @@ Node *Parser2::parse_EPrime(Node *ast_) {
 
             // build AST for next term, incorporate into current AST
             Node *term_ast = parse_T();
-            ast.reset(new Node(next_tok_tag == TOK_PLUS ? AST_ADD : AST_SUB, {ast.release(), term_ast}));
+            ast.reset(new Node(tok_to_ast(static_cast<TokenKind>(next_tok_tag)), {ast.release(), term_ast}));
 
             // copy source information from operator node
             ast->set_loc(op->get_loc());
@@ -243,7 +244,7 @@ Node *Parser2::parse_TPrime(Node *ast_) {
 
             // build AST for next primary expression, incorporate into current AST
             Node *primary_ast = parse_F();
-            ast.reset(new Node(next_tok_tag == TOK_TIMES ? AST_MULTIPLY : AST_DIVIDE, {ast.release(), primary_ast}));
+            ast.reset(new Node(tok_to_ast(static_cast<TokenKind>(next_tok_tag)), {ast.release(), primary_ast}));
 
             // copy source information from operator node
             ast->set_loc(op->get_loc());
@@ -274,7 +275,7 @@ Node *Parser2::parse_F() {
         // F -> ^ number
         // F -> ^ ident
         std::unique_ptr<Node> tok(expect(static_cast<enum TokenKind>(tag)));
-        int ast_tag = tag == TOK_INTEGER_LITERAL ? AST_INT_LITERAL : AST_VARREF;
+        int ast_tag = tok_to_ast(static_cast<TokenKind>(tag));
         std::unique_ptr<Node> ast(new Node(ast_tag));
         ast->set_str(tok->get_str());
         ast->set_loc(tok->get_loc());
@@ -348,5 +349,49 @@ void Parser2::expect_and_discard(enum TokenKind tok_kind) {
 
 void Parser2::error_at_current_loc(const std::string &msg) {
     SyntaxError::raise(m_lexer->get_current_loc(), "%s", msg.c_str());
+}
+
+ASTKind Parser2::tok_to_ast(TokenKind tag) {
+    switch (tag) {
+        case TOK_IDENTIFIER:
+            return AST_VARREF;
+        case TOK_VAR:
+            return AST_VARDEF;
+        case TOK_ASSIGN:
+            return AST_ASSIGN;
+        case TOK_INTEGER_LITERAL:
+            return AST_INT_LITERAL;
+        case TOK_PLUS:
+            return AST_ADD;
+        case TOK_MINUS:
+            return AST_SUB;
+        case TOK_TIMES:
+            return AST_MULTIPLY;
+        case TOK_DIVIDE:
+            return AST_DIVIDE;
+        case TOK_OR:
+            return AST_OR;
+        case TOK_AND:
+            return AST_AND;
+        case TOK_LESS:
+            return AST_LESS;
+        case TOK_LESSEQUAL:
+            return AST_LESSEQUAL;
+        case TOK_GREATER:
+            return AST_GREATER;
+        case TOK_GREATEREQUAL:
+            return AST_GREATEREQUAL;
+        case TOK_EQUAL:
+            return AST_EQUAL;
+        case TOK_NOTEQUAL:
+            return AST_NOTEQUAL;
+        case TOK_LPAREN:
+        case TOK_RPAREN:
+        case TOK_SEMICOLON:
+        default:
+            break;
+    }
+    Parser2::error_at_current_loc("Token failed to convert to valid AST Tag");
+    assert(0);
 }
 

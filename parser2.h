@@ -46,6 +46,8 @@ private:
     Node *parse_assign();
 
     Node *parse_R();
+
+    ASTKind tok_to_ast(TokenKind tag);
 };
 
 #endif // PARSER2_H

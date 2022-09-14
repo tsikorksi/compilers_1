@@ -19,6 +19,8 @@ std::string ASTTreePrint::node_tag_to_string(int tag) const {
             return "DIVIDE";
         case AST_VARREF:
             return "VARREF";
+        case AST_VARDEF:
+            return "VARDEF";
         case AST_INT_LITERAL:
             return "INT_LITERAL";
         case AST_UNIT:

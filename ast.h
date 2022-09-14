@@ -22,7 +22,7 @@ enum ASTKind {
   AST_GREATER,
   AST_GREATEREQUAL,
   AST_EQUAL,
-  AST_NOTEQUAL
+  AST_NOTEQUAL,
 };
 
 class ASTTreePrint : public TreePrint {
