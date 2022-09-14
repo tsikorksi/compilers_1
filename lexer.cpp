@@ -109,7 +109,7 @@ Node *Lexer::read_token() {
 
     std::string lexeme;
     lexeme.push_back(char(c));
-
+    std::cout << (char) c << std::endl;
     if (isalpha(c)) {
         Node *tok = read_continued_token(TOK_IDENTIFIER, lexeme, line, col, isalnum);
         if (tok->get_str() == "var") {
@@ -120,7 +120,6 @@ Node *Lexer::read_token() {
         return read_continued_token(TOK_INTEGER_LITERAL, lexeme, line, col, isdigit);
     } else {
         switch (c) {
-
             case '=':
                 return read_multi_equal(lexeme, line, col);
             case '+':
@@ -142,14 +141,11 @@ Node *Lexer::read_token() {
             case '>':
                 return read_multi_greater(lexeme, line, col);
             case '|':
-                next();
-                return token_create(TOK_OR, lexeme, line, col);
+                return read_continued_token(TOK_OR, lexeme, line, col, ispunct);
             case '&':
-                next();
-                return token_create(TOK_AND, lexeme, line, col);
+                return read_continued_token(TOK_AND, lexeme, line, col, ispunct);
             case '!':
-                next();
-                return token_create(TOK_NOTEQUAL, lexeme, line, col);
+                return read_continued_token(TOK_NOTEQUAL, lexeme, line, col, ispunct);
             default:
                 SyntaxError::raise(get_current_loc(), "Unrecognized character '%c'", c);
         }
@@ -187,10 +183,14 @@ Lexer::read_continued_token(enum TokenKind kind, const std::string &lexeme_start
 Node *Lexer::read_multi_equal(const std::string &lexeme, int line, int col) {
     enum TokenKind kind;
 
-    if (peek(1)->get_str()[0] == '=') {
-        next();
+    int next_c = read();
+    if (next_c < 0) {
+        // at eof
+        kind = TOK_ASSIGN;
+    } else if (next_c == '=') {
         kind = TOK_EQUAL;
     } else {
+        unread(next_c);
         kind = TOK_ASSIGN;
     }
     return token_create(kind, lexeme, line, col);
@@ -199,25 +199,34 @@ Node *Lexer::read_multi_equal(const std::string &lexeme, int line, int col) {
 Node *Lexer::read_multi_less(const std::string &lexeme, int line, int col) {
     enum TokenKind kind;
 
-    if (peek(1)->get_str()[0] == '=') {
-        next();
+    int next_c = read();
+    if (next_c < 0) {
+        // at eof
+        kind = TOK_LESS;
+
+    } else if (next_c == '=') {
         kind = TOK_LESSEQUAL;
     } else {
+        unread(next_c);
         kind = TOK_LESS;
     }
-
     return token_create(kind, lexeme, line, col);
 }
 
 Node *Lexer::read_multi_greater(const std::string &lexeme, int line, int col) {
     enum TokenKind kind;
 
-    if (peek(1)->get_str()[0] == '=') {
+    int next_c = read();
+    if (next_c < 0) {
+        // at eof
+        kind = TOK_GREATER;
+
+    } else if (next_c == '=') {
         kind = TOK_GREATEREQUAL;
     } else {
+        unread(next_c);
         kind = TOK_GREATER;
     }
-
     return token_create(kind, lexeme, line, col);
 }
 

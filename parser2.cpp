@@ -59,7 +59,7 @@ Node *Parser2::parse_Unit() {
 }
 
 Node *Parser2::parse_Stmt() {
-    // Stmt -> ^ E ;
+    // Stmt -> ^ A ;
     // Stmt -> ^ var ident ;
 
     std::cout << "STMT" << std::endl;
@@ -77,7 +77,7 @@ Node *Parser2::parse_Stmt() {
         return s.release();
 
     }
-    // Stmt -> ^ E ;
+    // Stmt -> ^ A ;
     s->append_kid(parse_A());
     expect_and_discard(TOK_SEMICOLON);
 
@@ -107,18 +107,19 @@ Node *Parser2::parse_L(){
     //L    → R
     std::cout << "L" << std::endl;
 
+    Node *lhs = parse_R();
+
     Node *next_tok = m_lexer->peek();
 
     if (next_tok != nullptr) {
         if (next_tok->get_tag() == TOK_AND || next_tok->get_tag() == TOK_OR) {
             //L    → R || R
             //L    → R && R
-            Node *lhs = parse_R();
 
             int tag = next_tok->get_tag();
 
             int ast_tag = tag == TOK_AND ? AST_AND : AST_OR;
-            std::unique_ptr<Node> op(expect(static_cast<enum TokenKind>(ast_tag)));
+            std::unique_ptr<Node> op(expect(static_cast<enum TokenKind>(tag)));
             Node *rhs = parse_R();
             op->append_kid(lhs);
             op->append_kid(rhs);
@@ -129,7 +130,7 @@ Node *Parser2::parse_L(){
     }
 
     //L    → R
-    return parse_R();
+    return lhs;
 
 }
 
@@ -143,14 +144,14 @@ Node *Parser2::parse_R() {
     //R    → E
 
     std::cout << "R" << std::endl;
-    Node *next_tok = m_lexer->peek(2);
 
-    std::cout << next_tok->get_tag() << std::endl;
+    Node *lhs = parse_E();
+
+    Node *next_tok = m_lexer->peek(1);
 
     if (next_tok->get_tag() < 18 && next_tok->get_tag() > 11) {
         std::cout << "R op R" << std::endl;
         //R    → ^E op E
-        Node *lhs = parse_E();
         //R    → E ^op E
         std::unique_ptr<Node> tok(expect(static_cast<enum TokenKind>(next_tok->get_tag())));
         int ast_tag = next_tok->get_tag() + 2000;
@@ -165,7 +166,7 @@ Node *Parser2::parse_R() {
     }
 
     //R    → E
-    return parse_E();
+    return lhs;
 }
 
 
@@ -280,6 +281,7 @@ Node *Parser2::parse_F() {
     }
 
     int tag = next_tok->get_tag();
+    std::cout << tag << std::endl;
     if (tag == TOK_INTEGER_LITERAL || tag == TOK_IDENTIFIER) {
         // F -> ^ number
         // F -> ^ ident
