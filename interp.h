@@ -22,6 +22,18 @@ private:
 
 
     void search_for_semantic(Node *ast, Environment *test_env);
+
+    Value do_math(Node * ast);
+
+    Value binary_op(Node * ast);
+
+    Value define_variable(Node *ast);
+
+    Value get_variable(Node *ast);
+
+    Value set_variable(Node *ast, int val);
+
+    Value execute_prime(Node *ast);
 };
 
 #endif // INTERP_H
