@@ -54,18 +54,19 @@ int execute(int argc, char **argv) {
 
   if (mode == PRINT_TOKENS) {
     // just print the tokens
-    bool done = false;
-    while (!done) {
-      Node *tok = lexer->next();
-      if (!tok) {
-        done = true;
-      } else {
-        int kind = tok->get_tag();
-        std::string lexeme = tok->get_str();
-        printf("%d:%s\n", kind, lexeme.c_str());
-        delete tok;
+      bool done = false;
+      while (!done) {
+          Node *tok = lexer->peek();
+          if (!tok) {
+              done = true;
+          } else {
+              tok = lexer->next();
+              int kind = tok->get_tag();
+              std::string lexeme = tok->get_str();
+              printf("%d:%s\n", kind, lexeme.c_str());
+              delete tok;
+          }
       }
-    }
   } else if (mode == PRINT_AST || mode == EXECUTE) {
     // Create parser and parse the input
     std::unique_ptr<Parser2> parser2(new Parser2(lexer.release()));

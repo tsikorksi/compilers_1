@@ -3,6 +3,7 @@
 
 #include "lexer.h"
 #include "node.h"
+#include "ast.h"
 
 class Parser2 {
 private:
