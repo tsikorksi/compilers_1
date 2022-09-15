@@ -34,6 +34,8 @@ private:
     Value set_variable(Node *ast, int val);
 
     Value execute_prime(Node *ast);
+
+    Value int_literal(Node *ast);
 };
 
 #endif // INTERP_H

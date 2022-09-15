@@ -334,7 +334,6 @@ Node *Parser2::parse_ident() {
 
 Node *Parser2::expect(enum TokenKind tok_kind) {
     std::unique_ptr<Node> next_terminal(m_lexer->next());
-    //std::cout << "Parser consumes: " << next_terminal->get_tag() << ", Expects: " << tok_kind << std::endl;
     if (next_terminal->get_tag() != tok_kind) {
         SyntaxError::raise(next_terminal->get_loc(), "Unexpected token '%s'", next_terminal->get_str().c_str());
     }
