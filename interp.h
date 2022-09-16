@@ -11,7 +11,7 @@ private:
   Node *m_ast;
 
 public:
-  Interpreter(Node *ast_to_adopt);
+  explicit Interpreter(Node *ast_to_adopt);
   ~Interpreter();
 
   void analyze();
@@ -27,15 +27,15 @@ private:
 
     Value binary_op(Node * ast);
 
-    Value define_variable(Node *ast);
+    static Value define_variable(Node *ast);
 
-    Value get_variable(Node *ast);
+    static Value get_variable(Node *ast);
 
-    Value set_variable(Node *ast, int val);
+    static Value set_variable(Node *ast, int val);
 
     Value execute_prime(Node *ast);
 
-    Value int_literal(Node *ast);
+    static Value int_literal(Node *ast);
 };
 
 #endif // INTERP_H

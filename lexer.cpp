@@ -3,7 +3,6 @@
 #include <cctype>
 #include <string>
 #include <iostream>
-#include "cpputil.h"
 #include "token.h"
 #include "exceptions.h"
 #include "lexer.h"
@@ -81,7 +80,6 @@ void Lexer::fill(int how_many) {
     assert(how_many > 0);
     while (!m_eof && int(m_lookahead.size()) < how_many) {
         Node *tok = read_token();
-        //std::cout << "Lexer Creates: " << node_tag_to_string(tok->get_tag())<< ", " << tok->get_str() << std::endl;
 
         if (tok != nullptr) {
             m_lookahead.push_back(tok);
@@ -189,6 +187,7 @@ Node *Lexer::read_multi_equal(const std::string &lexeme, int line, int col) {
     } else if (next_c == '=') {
         kind = TOK_EQUAL;
     } else {
+        // because we read in a token, this would prevent the next value being read correctly
         unread(next_c);
         kind = TOK_ASSIGN;
     }
@@ -230,6 +229,7 @@ Node *Lexer::read_multi_greater(const std::string &lexeme, int line, int col) {
 }
 
 std::string Lexer::node_tag_to_string(int tag) {
+    // was used for debugging, will keep in case of future modifications to lexer
     switch (tag) {
         case TOK_IDENTIFIER:
             return "VARREF";

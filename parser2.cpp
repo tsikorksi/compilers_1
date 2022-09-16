@@ -71,6 +71,7 @@ Node *Parser2::parse_Stmt() {
     } else if (next_tok->get_tag() == TOK_VAR) {
         // Stmt -> ^ var ident ;
         s->append_kid(parse_var());
+        // Stmt -> var ident ^ ;
         expect_and_discard(TOK_SEMICOLON);
         return s.release();
 
@@ -95,8 +96,10 @@ Node *Parser2::parse_A() {
     int next_tok_tag = next_tok->get_tag();
     int next_next_tok_tag = next_next_tok->get_tag();
     if (next_tok_tag == TOK_IDENTIFIER && next_next_tok_tag == TOK_ASSIGN) {
+        // A → ^ ident = A
         return parse_assign();
     } else {
+        // A → ^ L
         return parse_L();
     }
 }
@@ -112,13 +115,15 @@ Node *Parser2::parse_L() {
 
     if (next_tok != nullptr) {
         if (next_tok->get_tag() == TOK_AND || next_tok->get_tag() == TOK_OR) {
-            //L    → R || R
-            //L    → R && R
+            //L    → R ^|| R
+            //L    → R ^&& R
 
             int tag = next_tok->get_tag();
 
             int ast_tag = tok_to_ast(static_cast<TokenKind>(tag));
             std::unique_ptr<Node> op(expect(static_cast<enum TokenKind>(tag)));
+            //L    → R ||^ R
+            //L    → R &&^ R
             Node *rhs = parse_R();
             op->append_kid(lhs);
             op->append_kid(rhs);
@@ -145,7 +150,7 @@ Node *Parser2::parse_R() {
     //R    → E != E
     //R    → E
 
-
+    //R    → ^E op E
     Node *lhs = parse_E();
 
     Node *next_tok = m_lexer->peek(1);
@@ -154,7 +159,6 @@ Node *Parser2::parse_R() {
         Parser2::error_at_current_loc("Unexpected end of input");
     }
     if (next_tok->get_tag() < 18 && next_tok->get_tag() > 11) {
-        //R    → ^E op E
         //R    → E ^op E
         std::unique_ptr<Node> tok(expect(static_cast<enum TokenKind>(next_tok->get_tag())));
         int ast_tag = tok_to_ast(static_cast<TokenKind>(next_tok->get_tag()));
@@ -205,6 +209,7 @@ Node *Parser2::parse_EPrime(Node *ast_) {
 
             // build AST for next term, incorporate into current AST
             Node *term_ast = parse_T();
+            // E' ->  - T^ E'
             ast.reset(new Node(tok_to_ast(static_cast<TokenKind>(next_tok_tag)), {ast.release(), term_ast}));
 
             // copy source information from operator node

@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <iostream>
 #include "ast.h"
 #include "node.h"
 #include "exceptions.h"
@@ -42,17 +41,6 @@ Value Interpreter::execute_prime(Node * ast) {
     int tag = ast->get_tag();
     Value final;
     switch (ast->get_tag()) {
-        case AST_ADD:
-        case AST_SUB:
-        case AST_MULTIPLY:
-        case AST_DIVIDE:
-            return do_math(ast);
-        case AST_VARREF:
-            return get_variable(ast);
-        case AST_VARDEF:
-            return define_variable(ast);
-        case AST_INT_LITERAL:
-            return int_literal(ast);
         case AST_UNIT:
             for (unsigned i = 0; i < ast->get_num_kids() ;i++) {
                 final = execute_prime(ast->get_kid(i));
@@ -60,6 +48,12 @@ Value Interpreter::execute_prime(Node * ast) {
             return final;
         case AST_STATEMENT:
             return execute_prime(ast->get_kid(0));
+        case AST_VARREF:
+            return get_variable(ast);
+        case AST_VARDEF:
+            return define_variable(ast);
+        case AST_INT_LITERAL:
+            return int_literal(ast);
         case AST_ASSIGN:
             return set_variable(ast->get_kid(0), execute_prime(ast->get_kid(1)).get_ival());
         case AST_AND:
@@ -71,6 +65,11 @@ Value Interpreter::execute_prime(Node * ast) {
         case AST_EQUAL:
         case AST_NOTEQUAL:
             return binary_op(ast);
+        case AST_ADD:
+        case AST_SUB:
+        case AST_MULTIPLY:
+        case AST_DIVIDE:
+            return do_math(ast);
         default:
             RuntimeError::raise("Unknown AST node type %d\n", tag);
     }
@@ -119,8 +118,6 @@ Value Interpreter::binary_op(Node * ast) {
 
     int lhs = execute_prime(ast->get_kid(0)).get_ival();
     int rhs = execute_prime(ast->get_kid(1)).get_ival();
-
-    //std::cout << tag << ":" << lhs << "," << rhs << std::endl;
 
     switch (tag) {
         case AST_AND:

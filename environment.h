@@ -17,7 +17,6 @@ private:
 
 public:
   Environment(Environment *parent = nullptr);
-  Environment();
   ~Environment();
 
   // TODO: add member functions allowing lookup, definition, and assignment
