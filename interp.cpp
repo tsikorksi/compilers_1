@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <iostream>
 #include "ast.h"
 #include "node.h"
 #include "exceptions.h"
@@ -119,42 +120,53 @@ Value Interpreter::binary_op(Node * ast) {
     int lhs = execute_prime(ast->get_kid(0)).get_ival();
     int rhs = execute_prime(ast->get_kid(1)).get_ival();
 
+    //std::cout << tag << ":" << lhs << "," << rhs << std::endl;
+
     switch (tag) {
         case AST_AND:
             if (lhs != 0 && rhs != 0) {
                 return {1};
             }
+            break;
         case AST_OR:
             if (lhs != 0 || rhs != 0) {
                 return {1};
             }
+            break;
         case AST_LESS:
             if (lhs < rhs) {
                 return {1};
             }
+            break;
         case AST_LESSEQUAL:
             if (lhs <= rhs) {
                 return {1};
             }
+            break;
         case AST_GREATER:
             if (lhs > rhs) {
                 return {1};
             }
+            break;
         case AST_GREATEREQUAL:
             if (lhs >= rhs) {
                 return {1};
             }
+            break;
         case AST_EQUAL:
             if (lhs == rhs) {
                 return {1};
             }
+            break;
         case AST_NOTEQUAL:
             if (lhs != rhs) {
                 return {1};
             }
+            break;
         default:
             EvaluationError::raise(ast->get_loc(), "Invalid binary math for operator %s", ast->get_str().c_str());
     }
+    return {0};
 }
 
 Value Interpreter::int_literal(Node * ast) {

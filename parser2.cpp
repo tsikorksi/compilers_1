@@ -17,7 +17,7 @@
 //
 // Unit -> Stmt
 // Unit -> Stmt Unit
-// Stmt -> E ;
+// Stmt -> A ;
 // E -> T E'
 // E' -> + T E'
 // E' -> - T E'
@@ -29,7 +29,6 @@
 // F -> number
 // F -> ident
 // F -> ( E )
-// c = (a * 4 < 55) && (b == 16 || b >= 9 + 13);
 
 
 Parser2::Parser2(Lexer *lexer_to_adopt)
@@ -90,6 +89,9 @@ Node *Parser2::parse_A() {
 
     Node *next_tok = m_lexer->peek(1);
     Node *next_next_tok = m_lexer->peek(2);
+    if (next_tok == nullptr || next_next_tok == nullptr) {
+        Parser2::error_at_current_loc("Unexpected end of input");
+    }
     int next_tok_tag = next_tok->get_tag();
     int next_next_tok_tag = next_next_tok->get_tag();
     if (next_tok_tag == TOK_IDENTIFIER && next_next_tok_tag == TOK_ASSIGN) {
@@ -148,6 +150,9 @@ Node *Parser2::parse_R() {
 
     Node *next_tok = m_lexer->peek(1);
 
+    if (next_tok == nullptr) {
+        Parser2::error_at_current_loc("Unexpected end of input");
+    }
     if (next_tok->get_tag() < 18 && next_tok->get_tag() > 11) {
         //R    → ^E op E
         //R    → E ^op E
@@ -232,7 +237,6 @@ Node *Parser2::parse_TPrime(Node *ast_) {
     std::unique_ptr<Node> ast(ast_);
 
     // peek at next token
-    // Lexer reads and creates tokens for < and 55, but why?
     Node *next_tok = m_lexer->peek(1);
     if (next_tok != nullptr) {
         int next_tok_tag = next_tok->get_tag();
@@ -334,7 +338,10 @@ Node *Parser2::parse_ident() {
 
 Node *Parser2::expect(enum TokenKind tok_kind) {
     std::unique_ptr<Node> next_terminal(m_lexer->next());
-    if (next_terminal->get_tag() != tok_kind) {
+    if (next_terminal == nullptr) {
+        SyntaxError::raise(next_terminal->get_loc(), "Unexpected end of input, wanted %u", tok_kind);
+    }
+    else if (next_terminal->get_tag() != tok_kind) {
         SyntaxError::raise(next_terminal->get_loc(), "Unexpected token '%s'", next_terminal->get_str().c_str());
     }
 
