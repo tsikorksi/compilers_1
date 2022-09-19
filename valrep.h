@@ -24,7 +24,7 @@ private:
   ValRep &operator=(const ValRep &);
 
 public:
-  ValRep();
+  ValRep(ValRepKind kind);
   virtual ~ValRep();
 
   ValRepKind get_kind() const { return m_kind; }

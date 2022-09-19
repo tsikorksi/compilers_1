@@ -1,8 +1,9 @@
 #include "function.h"
 #include "valrep.h"
 
-ValRep::ValRep()
-  : m_refcount(0) {
+ValRep::ValRep(ValRepKind kind)
+  : m_kind(kind)
+  , m_refcount(0) {
 }
 
 ValRep::~ValRep() {
