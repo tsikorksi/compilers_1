@@ -379,6 +379,14 @@ void Parser2::error_at_current_loc(const std::string &msg) {
 
 ASTKind Parser2::tok_to_ast(TokenKind tag) {
     switch (tag) {
+        case TOK_FN:
+            return AST_FUNCTION;
+        case TOK_IF:
+            return AST_IF;
+        case TOK_WHILE:
+            return AST_WHILE;
+        case TOK_ELSE:
+            return AST_ELSE;
         case TOK_IDENTIFIER:
             return AST_VARREF;
         case TOK_VAR:
@@ -414,6 +422,9 @@ ASTKind Parser2::tok_to_ast(TokenKind tag) {
         case TOK_LPAREN:
         case TOK_RPAREN:
         case TOK_SEMICOLON:
+        case TOK_LBRACE:
+        case TOK_RBRACE:
+        case TOK_COMMA:
         default:
             break;
     }
