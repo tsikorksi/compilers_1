@@ -20,6 +20,7 @@ private:
   // Parse functions for nonterminal grammar symbols
   Node *parse_Unit();
   Node *parse_Stmt();
+  Node *parse_TStmt();
   Node *parse_E();
   Node *parse_EPrime(Node *ast);
   Node *parse_T();
@@ -49,6 +50,8 @@ private:
     Node *parse_R();
 
     ASTKind tok_to_ast(TokenKind tag);
+
+    Node *parse_func();
 };
 
 #endif // PARSER2_H

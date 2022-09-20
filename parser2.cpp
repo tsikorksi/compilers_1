@@ -15,10 +15,27 @@
 
 // This is the grammar (Unit is the start symbol):
 //
-// Unit -> Stmt
-// Unit -> Stmt Unit
+// Unit -> TStmt
+// Unit -> TStmt Unit
+// TStmt →      Stmt
+// Stmt →       if ( A ) { SList }                        -- if statement
+// Stmt →       if ( A ) { SList } else { SList }         -- if/else statement
+// Stmt →       while ( A ) { SList }                     -- while loop
 // Stmt -> A ;
 // Stmt → var ident ;
+// TStmt →      Func
+// Func →       function ident ( OptPList ) { SList }     -- function definition
+// OptPList →   PList                                     -- optional parameter list
+// OptPList →   ε
+// PList →      ident                                     -- nonempty parameter list
+// PList →      ident , PList
+// SList →      Stmt                                      -- statement list
+// SList →      Stmt SList
+// F →          ident ( OptArgList )                      -- function call
+// OptArgList → ArgList                                   -- optional argument list
+// OptArgList → ε
+// ArgList →    L                                         -- nonempty argument list
+// ArgList →    L , ArgList
 // A    → ident = A
 // A    → L
 // L    → R || R
@@ -64,7 +81,7 @@ Node *Parser2::parse_Unit() {
 
     std::unique_ptr<Node> unit(new Node(AST_UNIT));
     for (;;) {
-        unit->append_kid(parse_Stmt());
+        unit->append_kid(parse_TStmt());
         if (m_lexer->peek() == nullptr)
             break;
     }
@@ -72,9 +89,32 @@ Node *Parser2::parse_Unit() {
     return unit.release();
 }
 
+Node *Parser2::parse_TStmt() {
+    //TStmt →      Func
+    //TStmt →      Stmt
+    std::unique_ptr<Node> s(new Node(AST_STATEMENT));
+
+    Node *next_tok = m_lexer->peek();
+
+    if (next_tok == nullptr) {
+        SyntaxError::raise(m_lexer->get_current_loc(), "Unexpected end of input looking for statement");
+
+    } else if (next_tok->get_tag() ==  TOK_FN) {
+        //TStmt →      Func
+        return parse_func();
+    }
+
+    //TStmt →      Stmt
+    return parse_Stmt();
+
+}
+
 Node *Parser2::parse_Stmt() {
     // Stmt -> ^ A ;
     // Stmt -> ^ var ident ;
+    // Stmt →       if ( A ) { SList }                        -- if statement
+    // Stmt →       if ( A ) { SList } else { SList }         -- if/else statement
+    // Stmt →       while ( A ) { SList }                     -- while loop
 
     std::unique_ptr<Node> s(new Node(AST_STATEMENT));
 
@@ -96,6 +136,10 @@ Node *Parser2::parse_Stmt() {
     expect_and_discard(TOK_SEMICOLON);
 
     return s.release();
+}
+
+Node *Parser2::parse_func() {
+
 }
 
 
