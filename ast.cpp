@@ -9,6 +9,10 @@ ASTTreePrint::~ASTTreePrint() {
 
 std::string ASTTreePrint::node_tag_to_string(int tag) const {
     switch (tag) {
+        case AST_UNIT:
+            return "UNIT";
+        case AST_STATEMENT:
+            return "STATEMENT";
         case AST_ADD:
             return "ADD";
         case AST_SUB:
@@ -23,10 +27,6 @@ std::string ASTTreePrint::node_tag_to_string(int tag) const {
             return "VARDEF";
         case AST_INT_LITERAL:
             return "INT_LITERAL";
-        case AST_UNIT:
-            return "UNIT";
-        case AST_STATEMENT:
-            return "STATEMENT";
         case AST_ASSIGN:
             return "ASSIGN";
         case AST_AND:

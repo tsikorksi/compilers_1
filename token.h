@@ -15,6 +15,9 @@ enum TokenKind {
   TOK_DIVIDE,
   TOK_LPAREN,
   TOK_RPAREN,
+  TOK_RBRACE,
+  TOK_LBRACE,
+  TOK_COMMA,
   TOK_OR,
   TOK_AND,
   TOK_LESS,
@@ -24,6 +27,10 @@ enum TokenKind {
   TOK_EQUAL,
   TOK_NOTEQUAL,
   TOK_SEMICOLON,
+  TOK_FN,
+  TOK_IF,
+  TOK_ELSE,
+  TOK_WHILE,
 };
 
 #endif // TOKEN_H

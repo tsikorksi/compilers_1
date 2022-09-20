@@ -109,13 +109,24 @@ Node *Lexer::read_token() {
     lexeme.push_back(char(c));
     if (isalpha(c)) {
         Node *tok = read_continued_token(TOK_IDENTIFIER, lexeme, line, col, isalnum);
-        if (tok->get_str() == "var") {
+        std::string word = tok->get_str();
+        if (word == "var") {
             tok->set_tag(TOK_VAR);
+        } else if (word == "function") {
+            tok->set_tag(TOK_FN);
+        } else if (word == "if") {
+            tok->set_tag(TOK_IF);
+        } else if (word == "else") {
+            tok->set_tag(TOK_ELSE);
+        } else if (word == "while") {
+            tok->set_tag(TOK_WHILE);
         }
         return tok;
     } else if (isdigit(c)) {
         return read_continued_token(TOK_INTEGER_LITERAL, lexeme, line, col, isdigit);
     } else {
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "UnreachableCode"
         switch (c) {
             case '=':
                 return read_multi_equal(lexeme, line, col);
@@ -131,6 +142,12 @@ Node *Lexer::read_token() {
                 return token_create(TOK_LPAREN, lexeme, line, col);
             case ')':
                 return token_create(TOK_RPAREN, lexeme, line, col);
+            case '{':
+                return token_create(TOK_LBRACE, lexeme, line, col);
+            case '}':
+                return token_create(TOK_RBRACE, lexeme, line, col);
+            case ',':
+                return token_create(TOK_COMMA, lexeme, line, col);
             case ';':
                 return token_create(TOK_SEMICOLON, lexeme, line, col);
             case '<':
@@ -146,6 +163,7 @@ Node *Lexer::read_token() {
             default:
                 SyntaxError::raise(get_current_loc(), "Unrecognized character '%c'", c);
         }
+#pragma clang diagnostic pop
     }
 }
 
@@ -231,6 +249,14 @@ Node *Lexer::read_multi_greater(const std::string &lexeme, int line, int col) {
 std::string Lexer::node_tag_to_string(int tag) {
     // was used for debugging, will keep in case of future modifications to lexer
     switch (tag) {
+        case TOK_FN:
+            return "FUNCTION";
+        case TOK_IF:
+            return "IF";
+        case TOK_ELSE:
+            return "ELSE";
+        case TOK_WHILE:
+            return "WHILE";
         case TOK_IDENTIFIER:
             return "VARREF";
         case TOK_VAR:
@@ -248,9 +274,13 @@ std::string Lexer::node_tag_to_string(int tag) {
         case TOK_DIVIDE:
             return "DIVIDE";
         case TOK_LPAREN:
-            return "(";
+            return "LPAREN";
         case TOK_RPAREN:
-            return ")";
+            return "RPAREN";
+        case TOK_LBRACE:
+            return "LBRACE";
+        case TOK_RBRACE:
+            return "RBRACE";
         case TOK_OR:
             return "OR";
         case TOK_AND:
@@ -268,7 +298,9 @@ std::string Lexer::node_tag_to_string(int tag) {
         case TOK_NOTEQUAL:
             return "NOT";
         case TOK_SEMICOLON:
-            return ";";
+            return "SEMI";
+        case TOK_COMMA:
+            return "COMMA";
         default:
             return "";
     }

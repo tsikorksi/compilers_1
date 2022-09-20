@@ -63,7 +63,7 @@ int execute(int argc, char **argv) {
               tok = lexer->next();
               int kind = tok->get_tag();
               std::string lexeme = tok->get_str();
-              printf("%d:%s\n", kind, lexeme.c_str());
+              printf("%d:%s:%s\n", kind, lexeme.c_str(), lexer->node_tag_to_string(tok->get_tag()).c_str());
               delete tok;
           }
       }

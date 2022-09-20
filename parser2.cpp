@@ -18,6 +18,19 @@
 // Unit -> Stmt
 // Unit -> Stmt Unit
 // Stmt -> A ;
+// Stmt → var ident ;
+// A    → ident = A
+// A    → L
+// L    → R || R
+// L    → R && R
+// L    → R
+// R    → E < E
+// R    → E <= E
+// R    → E > E
+// R    → E >= E
+// R    → E == E
+// R    → E != E
+// R    → E
 // E -> T E'
 // E' -> + T E'
 // E' -> - T E'
@@ -28,7 +41,9 @@
 // T' -> epsilon
 // F -> number
 // F -> ident
-// F -> ( E )
+// F -> ( A )
+
+
 
 
 Parser2::Parser2(Lexer *lexer_to_adopt)
