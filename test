@@ -1,13 +1,12 @@
-var n;
-var sum;
-var i;
+var year;
+var a;
 
-n = 100;
-sum = 0;
-i = 1;
-while (i <= n) {
-  sum = sum + i;
-  i = i + 1;
+year = 2008;
+a = 0;
+if (( (year / 4) * 4 == year &&
+      (year / 100) * 100 != year ) ||
+    (year / 400) * 400 == year) {
+  a = 1;
 }
 
-sum;
+a;

@@ -158,7 +158,8 @@ Node *Parser2::parse_Stmt() {
         expect_and_discard(TOK_RBRACE);
 
         // Could very easily allow for else statements on while loops
-        if (m_lexer->peek()->get_tag() == TOK_ELSE && ast->get_tag() == AST_IF) {
+        next_tok = m_lexer->peek();
+        if (next_tok != nullptr && next_tok->get_tag() == TOK_ELSE && ast->get_tag() == AST_IF) {
             // Stmt →       if ( A ) { SList } ^else { SList }
             expect_and_discard(TOK_ELSE);
             expect_and_discard(TOK_LBRACE);
