@@ -51,7 +51,17 @@ private:
 
     ASTKind tok_to_ast(TokenKind tag);
 
-    Node *parse_func();
+    Node *parse_Func();
+
+    Node *parse_if();
+
+    Node *parse_SList(Node *ast);
+
+    Node *parse_while();
+
+    Node *parse_OptList();
+
+    Node *parse_PList(Node *pNode);
 };
 
 #endif // PARSER2_H

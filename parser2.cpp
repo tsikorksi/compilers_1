@@ -101,7 +101,7 @@ Node *Parser2::parse_TStmt() {
 
     } else if (next_tok->get_tag() ==  TOK_FN) {
         //TStmt →      Func
-        return parse_func();
+        return parse_Func();
     }
 
     //TStmt →      Stmt
@@ -130,6 +130,49 @@ Node *Parser2::parse_Stmt() {
         expect_and_discard(TOK_SEMICOLON);
         return s.release();
 
+    } else if (next_tok->get_tag() == TOK_IF) {
+        // Stmt →       if ( A ) { SList }                        -- if statement
+        // Stmt →       if ( A ) { SList } else { SList }         -- if/else statement
+        Node * if_ast = parse_if();
+
+        expect_and_discard(TOK_LPAREN);
+        if_ast->append_kid(parse_A());
+        expect_and_discard(TOK_RPAREN);
+
+        expect_and_discard(TOK_LBRACE);
+        std::unique_ptr<Node> slist(new Node(AST_STATEMENT_LIST));
+        if_ast->append_kid(parse_SList(slist.release()));
+        expect_and_discard(TOK_RBRACE);
+        next_tok = m_lexer->peek();
+
+        if (next_tok->get_tag() == TOK_ELSE) {
+            // Stmt →       if ( A ) { SList } else { SList }         -- if/else statement
+
+            expect_and_discard(TOK_LBRACE);
+            // generate node for content of loop
+
+            std::unique_ptr<Node> else_slist(new Node(AST_STATEMENT_LIST));
+            if_ast->append_kid(parse_SList(else_slist.release()));
+            expect_and_discard(TOK_RBRACE);
+        }
+        s->append_kid(if_ast);
+        return s.release();
+
+    } else if (next_tok->get_tag() == TOK_WHILE) {
+        // Stmt →       while ( A ) { SList }                     -- while loop
+        Node * while_ast = parse_while();
+
+        expect_and_discard(TOK_LPAREN);
+        while_ast->append_kid(parse_A());
+        expect_and_discard(TOK_RPAREN);
+
+        expect_and_discard(TOK_LBRACE);
+        // generate node for content of loop
+        std::unique_ptr<Node> slist(new Node(AST_STATEMENT_LIST));
+        while_ast->append_kid(parse_SList(slist.release()));
+        expect_and_discard(TOK_RBRACE);
+        s->append_kid(while_ast);
+        return s.release();
     }
     // Stmt -> ^ A ;
     s->append_kid(parse_A());
@@ -138,9 +181,81 @@ Node *Parser2::parse_Stmt() {
     return s.release();
 }
 
-Node *Parser2::parse_func() {
+Node *Parser2::parse_Func() {
+    // Func →       function ident ( OptPList ) { SList }     -- function definition
+
+    std::unique_ptr<Node> s(expect(TOK_FN));
+    s->append_kid(parse_ident());
+
+    expect_and_discard(TOK_LPAREN);
+    s->append_kid(parse_OptList());
+    expect_and_discard(TOK_RPAREN);
+
+    expect_and_discard(TOK_LBRACE);
+    std::unique_ptr<Node> slist(new Node(AST_STATEMENT_LIST));
+    s->append_kid(parse_SList(slist.release()));
+    expect_and_discard(TOK_RBRACE);
+
+
+    return s.release();
+}
+
+Node *Parser2::parse_OptList() {
+    // OptPList →   PList                                     -- optional parameter list
+    // OptPList →   ε
+
+    std::unique_ptr<Node> s(new Node(AST_PARAMETER_LIST));
+
+    Node *next_tok = m_lexer->peek(1);
+
+    if (next_tok != nullptr && next_tok->get_tag() == TOK_IDENTIFIER) {
+        // OptPList →   ^PList
+        // PList starts with identifier
+        return parse_PList(s.release());
+    }
+    // OptPList →   ^ε
+    return s.release();
+}
+
+
+Node *Parser2::parse_PList(Node *opt_list_) {
+    // PList →      ident                                     -- nonempty parameter list
+    // PList →      ident , PList
+
+    std::unique_ptr<Node> opt_list(opt_list_);
+
+
+    opt_list->append_kid(parse_ident());
+
+    Node *next_tok = m_lexer->peek(1);
+    if (next_tok->get_tag() == TOK_COMMA) {
+        expect_and_discard(TOK_COMMA);
+        parse_PList(opt_list.release());
+    }
+    return opt_list.release();
+}
+
+
+Node *Parser2::parse_SList(Node* slist_){
+    // SList →      Stmt                                      -- statement list
+    // SList →      Stmt SList
+
+    std::unique_ptr<Node> slist(slist_);
+
+
+    slist->append_kid(parse_Stmt());
+    // SList →      Stmt ^SList
+    Node *next_tok = m_lexer->peek(1);
+
+    if (next_tok->get_tag() != TOK_RBRACE) {
+        parse_SList(slist.release());
+    }
+    return slist.release();
 
 }
+
+
+
 
 
 Node *Parser2::parse_A() {
@@ -400,6 +515,24 @@ Node *Parser2::parse_ident() {
 
 }
 
+Node *Parser2::parse_if() {
+    std::unique_ptr<Node> tok(expect(static_cast<enum TokenKind>(TOK_IF)));
+    std::unique_ptr<Node> ast(new Node(AST_IF));
+    ast->set_str(tok->get_str());
+    ast->set_loc(tok->get_loc());
+    return ast.release();
+}
+
+
+Node *Parser2::parse_while() {
+    std::unique_ptr<Node> tok(expect(static_cast<enum TokenKind>(TOK_WHILE)));
+    std::unique_ptr<Node> ast(new Node(AST_WHILE));
+    ast->set_str(tok->get_str());
+    ast->set_loc(tok->get_loc());
+    return ast.release();
+}
+
+
 Node *Parser2::expect(enum TokenKind tok_kind) {
     std::unique_ptr<Node> next_terminal(m_lexer->next());
     if (next_terminal == nullptr) {
@@ -475,4 +608,6 @@ ASTKind Parser2::tok_to_ast(TokenKind tag) {
     Parser2::error_at_current_loc("Token failed to convert to valid AST Tag");
     assert(0);
 }
+
+
 
