@@ -36,6 +36,10 @@ private:
     Value execute_prime(Node *ast);
 
     static Value int_literal(Node *ast);
+
+    void try_if(Node *pNode);
+
+    void try_while(Node *pNode);
 };
 
 #endif // INTERP_H

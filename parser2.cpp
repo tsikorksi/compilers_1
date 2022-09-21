@@ -160,6 +160,7 @@ Node *Parser2::parse_Stmt() {
         // Could very easily allow for else statements on while loops
         if (m_lexer->peek()->get_tag() == TOK_ELSE && ast->get_tag() == AST_IF) {
             // Stmt →       if ( A ) { SList } ^else { SList }
+            expect_and_discard(TOK_ELSE);
             expect_and_discard(TOK_LBRACE);
             // generate node for content of loop
 

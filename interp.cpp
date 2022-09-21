@@ -9,11 +9,11 @@ Environment testing_env(nullptr);
 Environment execution_env(nullptr);
 
 Interpreter::Interpreter(Node *ast_to_adopt)
-  : m_ast(ast_to_adopt) {
+        : m_ast(ast_to_adopt) {
 }
 
 Interpreter::~Interpreter() {
-  delete m_ast;
+    delete m_ast;
 }
 
 void Interpreter::analyze() {
@@ -34,13 +34,14 @@ void Interpreter::search_for_semantic(Node *ast, Environment*test_env) {
 }
 
 Value Interpreter::execute() {
-  return execute_prime(m_ast);
+    return execute_prime(m_ast);
 }
 
 Value Interpreter::execute_prime(Node * ast) {
     int tag = ast->get_tag();
     Value final;
     switch (ast->get_tag()) {
+        case AST_STATEMENT_LIST:
         case AST_UNIT:
             for (unsigned i = 0; i < ast->get_num_kids() ;i++) {
                 final = execute_prime(ast->get_kid(i));
@@ -48,6 +49,14 @@ Value Interpreter::execute_prime(Node * ast) {
             return final;
         case AST_STATEMENT:
             return execute_prime(ast->get_kid(0));
+        case AST_IF:
+            try_if(ast);
+            // control flow evaluates to 0
+            return {0};
+        case AST_WHILE:
+            try_while(ast);
+            // control flow evaluates to 0
+            return {0};
         case AST_VARREF:
             return get_variable(ast);
         case AST_VARDEF:
@@ -74,6 +83,36 @@ Value Interpreter::execute_prime(Node * ast) {
             RuntimeError::raise("Unknown AST node type %d\n", tag);
     }
 }
+
+void Interpreter::try_if(Node *ast) {
+    Value condition = execute_prime(ast->get_kid(0));
+
+    if (condition.is_numeric()){
+        if (condition.get_ival()){
+            execute_prime(ast->get_kid(1));
+        } else {
+            if (ast->get_num_kids() == 3) {
+                execute_prime(ast->get_kid(2));
+            }
+        }
+    } else {
+        EvaluationError::raise(ast->get_loc(), "If Statement condition is not numeric");
+
+    }
+}
+
+void Interpreter::try_while(Node *ast) {
+    Value condition = execute_prime(ast->get_kid(0));
+    if (condition.is_numeric()) {
+        while (condition.get_ival()) {
+            execute_prime(ast->get_kid(1));
+            condition = execute_prime(ast->get_kid(0));
+        }
+    } else {
+        EvaluationError::raise(ast->get_loc(), "While Statement condition is not numeric");
+    }
+}
+
 
 Value Interpreter::define_variable(Node * ast){
     execution_env.new_variable(ast->get_last_kid()->get_str(), ast->get_last_kid()->get_loc());
@@ -189,3 +228,6 @@ Value Interpreter::binary_op(Node * ast) {
 Value Interpreter::int_literal(Node * ast) {
     return {std::stoi(ast->get_str())};
 }
+
+
+
