@@ -110,11 +110,11 @@ Node *Parser2::parse_TStmt() {
 }
 
 Node *Parser2::parse_Stmt() {
-    // Stmt -> ^ A ;
-    // Stmt -> ^ var ident ;
-    // Stmt →       if ( A ) { SList }                        -- if statement
-    // Stmt →       if ( A ) { SList } else { SList }         -- if/else statement
-    // Stmt →       while ( A ) { SList }                     -- while loop
+    // Stmt ->  A ;
+    // Stmt ->  var ident ;
+    // Stmt ->  if ( A ) { SList }                        -- if statement
+    // Stmt ->  if ( A ) { SList } else { SList }         -- if/else statement
+    // Stmt ->  while ( A ) { SList }                     -- while loop
 
     std::unique_ptr<Node> s(new Node(AST_STATEMENT));
 
@@ -154,7 +154,7 @@ Node *Parser2::parse_Stmt() {
         // Stmt →      ctrl ( A ) ^{ SList }
         expect_and_discard(TOK_LBRACE);
         std::unique_ptr<Node> slist(new Node(AST_STATEMENT_LIST));
-        ast->append_kid(parse_SList(slist.release()));
+        ast->append_kid(parse_SList());
         expect_and_discard(TOK_RBRACE);
 
         // Could very easily allow for else statements on while loops
@@ -164,7 +164,7 @@ Node *Parser2::parse_Stmt() {
             // generate node for content of loop
 
             std::unique_ptr<Node> else_slist(new Node(AST_STATEMENT_LIST));
-            ast->append_kid(parse_SList(else_slist.release()));
+            ast->append_kid(parse_SList());
             expect_and_discard(TOK_RBRACE);
         }
         s->append_kid(ast);
@@ -190,7 +190,7 @@ Node *Parser2::parse_Func() {
 
     expect_and_discard(TOK_LBRACE);
     std::unique_ptr<Node> slist(new Node(AST_STATEMENT_LIST));
-    func_ast->append_kid(parse_SList(slist.release()));
+    func_ast->append_kid(parse_SList());
     expect_and_discard(TOK_RBRACE);
 
 
@@ -268,24 +268,20 @@ Node *Parser2::parse_ArgList(Node *arg_list_) {
 }
 
 
-Node *Parser2::parse_SList(Node* slist_){
+Node *Parser2::parse_SList() {
     // SList →      Stmt                                      -- statement list
     // SList →      Stmt SList
+    std::unique_ptr<Node> slist(new Node(AST_STATEMENT_LIST));
 
-    std::unique_ptr<Node> slist(slist_);
+    Node *next_tok = m_lexer->peek();
 
-
-    slist->append_kid(parse_Stmt());
-    Node *next_tok = m_lexer->peek(1);
-
-    if (next_tok->get_tag() != TOK_RBRACE) {
-        // SList →      Stmt ^SList
-        parse_SList(slist.release());
+    // Keep searching for new segments until you hit the end of the function scope
+    while (next_tok->get_tag() != TOK_RBRACE) {
+        slist->append_kid(parse_Stmt());
+        next_tok = m_lexer->peek();
     }
     return slist.release();
-
 }
-
 
 
 Node *Parser2::parse_A() {

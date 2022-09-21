@@ -68,6 +68,8 @@ private:
     Node *parse_ArgList(Node *arg_list_);
 
     Node *parse_function();
+
+    Node *parse_SList();
 };
 
 #endif // PARSER2_H
