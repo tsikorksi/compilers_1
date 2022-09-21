@@ -119,60 +119,57 @@ Node *Parser2::parse_Stmt() {
     std::unique_ptr<Node> s(new Node(AST_STATEMENT));
 
     Node *next_tok = m_lexer->peek();
-
     if (next_tok == nullptr) {
         SyntaxError::raise(m_lexer->get_current_loc(), "Unexpected end of input looking for statement");
 
-    } else if (next_tok->get_tag() == TOK_VAR) {
+    }
+
+    int tag = next_tok->get_tag();
+
+    if (tag == TOK_VAR) {
         // Stmt -> ^ var ident ;
         s->append_kid(parse_var());
         // Stmt -> var ident ^ ;
         expect_and_discard(TOK_SEMICOLON);
         return s.release();
 
-    } else if (next_tok->get_tag() == TOK_IF) {
-        // Stmt →       if ( A ) { SList }                        -- if statement
-        // Stmt →       if ( A ) { SList } else { SList }         -- if/else statement
-        Node * if_ast = parse_if();
+    } else if (tag == TOK_IF || tag == TOK_WHILE) {
+        // Stmt →      ^ if ( A ) { SList }                        -- if statement
+        // Stmt →      ^ if ( A ) { SList } else { SList }         -- if/else statement
+        // Stmt →      ^ while ( A ) { SList }                     -- while loop
+        Node * ast;
+        if (tag == TOK_IF) {
+            // Stmt →      ^ if ( A ) { SList }
+            ast = parse_if();
+        } else {
+            // Stmt →      ^ while ( A ) { SList }
+            ast = parse_while();
+        }
 
+        // Stmt →      ctrl ^( A ) { SList }
         expect_and_discard(TOK_LPAREN);
-        if_ast->append_kid(parse_A());
+        ast->append_kid(parse_A());
         expect_and_discard(TOK_RPAREN);
 
+        // Stmt →      ctrl ( A ) ^{ SList }
         expect_and_discard(TOK_LBRACE);
         std::unique_ptr<Node> slist(new Node(AST_STATEMENT_LIST));
-        if_ast->append_kid(parse_SList(slist.release()));
+        ast->append_kid(parse_SList(slist.release()));
         expect_and_discard(TOK_RBRACE);
-        next_tok = m_lexer->peek();
 
-        if (next_tok->get_tag() == TOK_ELSE) {
-            // Stmt →       if ( A ) { SList } else { SList }         -- if/else statement
-
+        // Could very easily allow for else statements on while loops
+        if (m_lexer->peek()->get_tag() == TOK_ELSE && ast->get_tag() == AST_IF) {
+            // Stmt →       if ( A ) { SList } ^else { SList }
             expect_and_discard(TOK_LBRACE);
             // generate node for content of loop
 
             std::unique_ptr<Node> else_slist(new Node(AST_STATEMENT_LIST));
-            if_ast->append_kid(parse_SList(else_slist.release()));
+            ast->append_kid(parse_SList(else_slist.release()));
             expect_and_discard(TOK_RBRACE);
         }
-        s->append_kid(if_ast);
+        s->append_kid(ast);
         return s.release();
 
-    } else if (next_tok->get_tag() == TOK_WHILE) {
-        // Stmt →       while ( A ) { SList }                     -- while loop
-        Node * while_ast = parse_while();
-
-        expect_and_discard(TOK_LPAREN);
-        while_ast->append_kid(parse_A());
-        expect_and_discard(TOK_RPAREN);
-
-        expect_and_discard(TOK_LBRACE);
-        // generate node for content of loop
-        std::unique_ptr<Node> slist(new Node(AST_STATEMENT_LIST));
-        while_ast->append_kid(parse_SList(slist.release()));
-        expect_and_discard(TOK_RBRACE);
-        s->append_kid(while_ast);
-        return s.release();
     }
     // Stmt -> ^ A ;
     s->append_kid(parse_A());
@@ -279,10 +276,10 @@ Node *Parser2::parse_SList(Node* slist_){
 
 
     slist->append_kid(parse_Stmt());
-    // SList →      Stmt ^SList
     Node *next_tok = m_lexer->peek(1);
 
     if (next_tok->get_tag() != TOK_RBRACE) {
+        // SList →      Stmt ^SList
         parse_SList(slist.release());
     }
     return slist.release();
@@ -578,12 +575,9 @@ Node *Parser2::parse_while() {
 Node *Parser2::parse_function() {
     std::unique_ptr<Node> tok(expect(static_cast<enum TokenKind>(TOK_FN)));
     std::unique_ptr<Node> ast(new Node(AST_FUNCTION));
-    ast->set_str(tok->get_str());
     ast->set_loc(tok->get_loc());
     return ast.release();
 }
-
-
 
 
 Node *Parser2::expect(enum TokenKind tok_kind) {
