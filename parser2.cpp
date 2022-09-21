@@ -359,7 +359,7 @@ Node *Parser2::parse_R() {
     if (next_tok == nullptr) {
         Parser2::error_at_current_loc("Unexpected end of input");
     }
-    if (next_tok->get_tag() < 18 && next_tok->get_tag() > 11) {
+    if (next_tok->get_tag() < 25 && next_tok->get_tag() > 18) {
         //R    → E ^op E
         std::unique_ptr<Node> tok(expect(static_cast<enum TokenKind>(next_tok->get_tag())));
         int ast_tag = tok_to_ast(static_cast<TokenKind>(next_tok->get_tag()));

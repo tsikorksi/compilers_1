@@ -128,8 +128,6 @@ Node *Lexer::read_token() {
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnreachableCode"
         switch (c) {
-            case '=':
-                return read_multi_equal(lexeme, line, col);
             case '+':
                 return token_create(TOK_PLUS, lexeme, line, col);
             case '-':
@@ -150,6 +148,8 @@ Node *Lexer::read_token() {
                 return token_create(TOK_COMMA, lexeme, line, col);
             case ';':
                 return token_create(TOK_SEMICOLON, lexeme, line, col);
+            case '=':
+                return read_multi_equal(lexeme, line, col);
             case '<':
                 return read_multi_less(lexeme, line, col);
             case '>':
