@@ -115,17 +115,37 @@ Value Interpreter::do_math(Node * ast) {
 Value Interpreter::binary_op(Node * ast) {
 
     int tag = ast->get_tag();
-
     int lhs = execute_prime(ast->get_kid(0)).get_ival();
+
+    // Short circuit the OR and AND binary operations
+    switch (tag) {
+        case AST_AND:
+            if (lhs == 0) {
+                return {1};
+            }
+        case AST_OR:
+            if (lhs == 1) {
+                return {1};
+            }
+        default:
+            break;
+    }
+
     int rhs = execute_prime(ast->get_kid(1)).get_ival();
 
     switch (tag) {
         case AST_AND:
-            if (lhs != 0 && rhs != 0) {
+            if (lhs == 0) {
+                return {1};
+            }
+            if (rhs != 0) {
                 return {1};
             }
             break;
         case AST_OR:
+            if (lhs == 1) {
+                return {1};
+            }
             if (lhs != 0 || rhs != 0) {
                 return {1};
             }
