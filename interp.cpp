@@ -160,12 +160,14 @@ Value Interpreter::binary_op(Node * ast) {
     switch (tag) {
         case AST_AND:
             if (lhs == 0) {
-                return {1};
+                return {0};
             }
+            break;
         case AST_OR:
             if (lhs == 1) {
                 return {1};
             }
+            break;
         default:
             break;
     }
@@ -174,17 +176,11 @@ Value Interpreter::binary_op(Node * ast) {
 
     switch (tag) {
         case AST_AND:
-            if (lhs == 0) {
-                return {1};
-            }
-            if (rhs != 0) {
+            if (lhs == 1 && rhs == 1) {
                 return {1};
             }
             break;
         case AST_OR:
-            if (lhs == 1) {
-                return {1};
-            }
             if (lhs != 0 || rhs != 0) {
                 return {1};
             }
