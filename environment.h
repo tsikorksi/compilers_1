@@ -9,7 +9,7 @@
 class Environment {
 private:
   Environment *m_parent;
-  std::map<std::string, int> variables;
+  std::map<std::string, Value> variables;
 
   // copy constructor and assignment operator prohibited
   Environment(const Environment &);
@@ -21,11 +21,13 @@ public:
 
   // TODO: add member functions allowing lookup, definition, and assignment
 
-    int get_variable(const std::string& identifier, const Location &loc);
+    Value get_variable(const std::string& identifier, const Location &loc);
 
     void new_variable(const std::string &identifier, const Location &loc);
 
-    void set_variable(const std::string &identifier, int value);
+    void set_variable(const std::string &identifier, const Value& value);
+
+    void bind(const std::string &identifier, const Location &loc, const Value &value);
 };
 
 #endif // ENVIRONMENT_H
