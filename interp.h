@@ -31,8 +31,6 @@ private:
 
     static Value get_variable(Node *ast);
 
-    static Value set_variable(Node *ast, int val);
-
     Value execute_prime(Node *ast);
 
     static Value int_literal(Node *ast);
@@ -40,6 +38,14 @@ private:
     void try_if(Node *pNode);
 
     void try_while(Node *pNode);
+
+    static Value set_variable(Node *ast, const Value& val);
+
+    void add_intrinsic();
+
+    static Value intrinsic_print(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp);
+
+    static Value intrinsic_println(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp);
 };
 
 #endif // INTERP_H

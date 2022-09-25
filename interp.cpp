@@ -6,7 +6,7 @@
 #include "interp.h"
 
 Environment testing_env(nullptr);
-Environment execution_env(nullptr);
+Environment global_env(nullptr);
 
 Interpreter::Interpreter(Node *ast_to_adopt)
         : m_ast(ast_to_adopt) {
@@ -33,7 +33,13 @@ void Interpreter::search_for_semantic(Node *ast, Environment*test_env) {
     }
 }
 
+void Interpreter::add_intrinsic() {
+    global_env.bind("print",m_ast->get_loc() , Value(&intrinsic_print));
+    global_env.bind("println",m_ast->get_loc() , Value(&intrinsic_println));
+}
+
 Value Interpreter::execute() {
+    add_intrinsic();
     return execute_prime(m_ast);
 }
 
@@ -64,7 +70,7 @@ Value Interpreter::execute_prime(Node * ast) {
         case AST_INT_LITERAL:
             return int_literal(ast);
         case AST_ASSIGN:
-            return set_variable(ast->get_kid(0), execute_prime(ast->get_kid(1)).get_ival());
+            return set_variable(ast->get_kid(0), execute_prime(ast->get_kid(1)));
         case AST_AND:
         case AST_OR:
         case AST_LESS:
@@ -115,16 +121,16 @@ void Interpreter::try_while(Node *ast) {
 
 
 Value Interpreter::define_variable(Node * ast){
-    execution_env.new_variable(ast->get_last_kid()->get_str(), ast->get_last_kid()->get_loc());
+    global_env.new_variable(ast->get_last_kid()->get_str(), ast->get_last_kid()->get_loc());
     return {0};
 }
 
 Value Interpreter::get_variable(Node * ast){
-    return {execution_env.get_variable(ast->get_str(), ast->get_loc())};
+    return {global_env.get_variable(ast->get_str(), ast->get_loc())};
 }
 
-Value Interpreter::set_variable(Node * ast, int val) {
-    execution_env.set_variable(ast->get_str(), val);
+Value Interpreter::set_variable(Node * ast, const Value& val) {
+    global_env.set_variable(ast->get_str(), val);
     return {val};
 }
 
@@ -224,6 +230,22 @@ Value Interpreter::binary_op(Node * ast) {
 Value Interpreter::int_literal(Node * ast) {
     return {std::stoi(ast->get_str())};
 }
+
+
+Value Interpreter::intrinsic_print(Value args[], unsigned num_args,
+                                   const Location &loc, Interpreter *interp) {
+    if (num_args != 1)
+        EvaluationError::raise(loc, "Wrong number of arguments passed to print function");
+    printf("%s", args[0].as_str().c_str());
+    return {};
+}
+
+Value Interpreter::intrinsic_println(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
+    intrinsic_print(args, num_args, loc, interp);
+    printf("\n");
+    return {};
+}
+
 
 
 
