@@ -1,5 +1,27 @@
-function add(x, y) {
-  x + y;
+var a;
+var b;
+var c;
+var d;
+
+a = 3;
+
+b = 99;
+c = 101;
+d = 103;
+
+if (a) {
+  var b;
+  b = 65;
+  if (a) {
+    var c;
+    c = 66;
+    if (a) {
+      d = 67;
+    }
+  }
 }
 
-add(41, 79);
+println(b);
+println(c);
+println(d);
+a;

@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include "value.h"
+#include "node.h"
 
 class Environment {
 private:
@@ -23,11 +24,14 @@ public:
 
     Value get_variable(const std::string& identifier, const Location &loc);
 
-    void new_variable(const std::string &identifier, const Location &loc);
-
-    void set_variable(const std::string &identifier, const Value& value);
+    void set_variable(const std::string &identifier, const Value &value, const Location &loc);
 
     void bind(const std::string &identifier, const Location &loc, const Value &value);
+
+    void new_variable(const std::string &identifier, const Location &loc, ValueKind kind);
+
+    Function *get_function(Node *ast);
+    IntrinsicFn * get_intrinsic(Node * ast);
 };
 
 #endif // ENVIRONMENT_H
