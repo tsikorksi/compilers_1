@@ -41,9 +41,6 @@ private:
 
     static Value set_variable(Node *ast, const Value &val, Environment *env);
 
-    static IntrinsicFn intrinsic_print(Value *args, unsigned int num_args, const Location &loc);
-
-    static IntrinsicFn intrinsic_println(Value *args, unsigned int num_args, const Location &loc);
 
     Value call_intrinsic(Node *ast, Environment *env);
 
@@ -52,6 +49,12 @@ private:
     Value execute_statement_list(Node *ast, Environment *env);
 
     void check_condition(Node *ast, Environment *env);
+
+    static IntrinsicFn intrinsic_println(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp);
+
+    static IntrinsicFn intrinsic_print(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp);
+
+    static Value intrinsic_readint(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp);
 };
 
 #endif // INTERP_H

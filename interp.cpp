@@ -98,9 +98,9 @@ Value Interpreter::execute_prime(Node *ast, Environment *env) {
             return int_literal(ast);
         case AST_ASSIGN:
             return set_variable(ast->get_kid(0), execute_prime(ast->get_kid(1), env), env);
-        case AST_ARGLIST:
-            //TODO: convert to generating list
-            return execute_prime(ast->get_kid(0), env);
+        case AST_ARGLIST:{
+            EvaluationError::raise(ast->get_loc(),"Argument list made child of non-function call");
+        }
         case AST_AND:
         case AST_OR:
         case AST_LESS:
@@ -297,33 +297,45 @@ Value Interpreter::int_literal(Node * ast) {
 }
 
 
-IntrinsicFn Interpreter::intrinsic_print(Value args[], unsigned num_args, const Location &loc) {
+IntrinsicFn Interpreter::intrinsic_print(Value args[], unsigned num_args, const Location &loc, Interpreter * interp) {
     if (num_args != 1)
         EvaluationError::raise(loc, "Wrong number of arguments passed to print function");
     std::cout << args[0].as_str().c_str();
     return {};
 }
 
-IntrinsicFn Interpreter::intrinsic_println(Value args[], unsigned int num_args, const Location &loc) {
-    intrinsic_print(args, num_args, loc);
+IntrinsicFn Interpreter::intrinsic_println(Value args[], unsigned int num_args, const Location &loc, Interpreter * interp) {
+    intrinsic_print(args, num_args, loc, interp);
     std::cout << "\n";
     return {};
 }
 
+Value Interpreter::intrinsic_readint(Value args[], unsigned int num_args, const Location &loc, Interpreter * interp) {
+    if (num_args != 0)
+        EvaluationError::raise(loc, "Wrong number of arguments passed to readint function");
+    int input = 0;
+    int result = scanf("%i", &input);
+    if (result == 0) {
+        EvaluationError::raise(loc,"No input detected");
+    } else if (result  == EOF) {
+        EvaluationError::raise(loc, "Unexpected End Of File");
+    }
+    return {input};
+}
+
 Value Interpreter::call_intrinsic(Node *ast, Environment *env) {
 
-    //TODO: have it actually pull from global_env
     std::string name = ast->get_str();
-    Value arg = execute_prime(ast->get_kid(0), env);
+    Node * arg_list = ast->get_kid(0);
+    Value args[arg_list->get_num_kids()];
 
-    Value  args[1] = {arg};
-
-    if (name == "print") {
-        return intrinsic_print(args, 1, ast->get_loc());
-    } else if (name == "println") {
-        return intrinsic_println(args, 1, ast->get_loc());
+    for (unsigned i = 0; i < arg_list->get_num_kids(); i++) {
+        args[i] = execute_prime(arg_list->get_kid(i), env);
     }
-    return {};
+
+    Value fn = get_variable(ast, env);
+    IntrinsicFn fp = fn.get_intrinsic_fn();
+    return fp(args, arg_list->get_num_kids(), ast->get_loc(), this);
 }
 
 

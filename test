@@ -1,27 +1,5 @@
-var a;
-var b;
-var c;
-var d;
-
-a = 3;
-
-b = 99;
-c = 101;
-d = 103;
-
-if (print(a)) {
-  var b;
-  b = 65;
-  if (a) {
-    var c;
-    c = 66;
-    if (a) {
-      d = 67;
-    }
-  }
+function add(x, y) {
+  x + y;
 }
 
-println(b);
-println(c);
-println(d);
-a;
+add(41, 79);
