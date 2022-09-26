@@ -89,6 +89,7 @@ Value Interpreter::execute_prime(Node *ast, Environment *env) {
                     case VALUE_INTRINSIC_FN:
                         return call_intrinsic(ast, env);
                     case VALUE_FUNCTION: {
+                        // TODO: There is an issue with how scope si being deployed, effecting functions being called from another function.
                         // extract function from environment
                         Function * fn = get_variable(ast, env).get_function();
                         Environment func_env(env);
@@ -117,10 +118,10 @@ Value Interpreter::execute_prime(Node *ast, Environment *env) {
         case AST_ASSIGN:
             return set_variable(ast->get_kid(0), execute_prime(ast->get_kid(1), env), env);
         case AST_ARGLIST:{
-            EvaluationError::raise(ast->get_loc(),"Argument list made child of non-function call");
+            EvaluationError::raise(ast->get_loc(),"Argument list made child of non function call");
         }
         case AST_PARAMETER_LIST:{
-            EvaluationError::raise(ast->get_loc(),"Parameter list made child of non-function call");
+            EvaluationError::raise(ast->get_loc(),"Parameter list made child of non function call");
         }
         case AST_AND:
         case AST_OR:
