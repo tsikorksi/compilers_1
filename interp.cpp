@@ -45,8 +45,8 @@ void Interpreter::search_for_semantic(Node *ast, Environment*test_env) {
 }
 
 void Interpreter::add_intrinsic(Environment * env) {
-    env->bind("print",m_ast->get_loc() , Value(&intrinsic_print));
-    env->bind("println",m_ast->get_loc() , Value(&intrinsic_println));
+    env->bind("print",m_ast->get_loc() , IntrinsicFn (intrinsic_print));
+    env->bind("println",m_ast->get_loc() , IntrinsicFn (intrinsic_println));
 }
 
 Value Interpreter::execute() {
@@ -290,15 +290,14 @@ Value Interpreter::int_literal(Node * ast) {
 }
 
 
-Value Interpreter::intrinsic_print(Value args[], unsigned num_args,
-                                   const Location &loc) {
+IntrinsicFn Interpreter::intrinsic_print(Value args[], unsigned num_args, const Location &loc) {
     if (num_args != 1)
         EvaluationError::raise(loc, "Wrong number of arguments passed to print function");
     std::cout << args[0].as_str().c_str();
     return {};
 }
 
-Value Interpreter::intrinsic_println(Value *args, unsigned int num_args, const Location &loc) {
+IntrinsicFn Interpreter::intrinsic_println(Value args[], unsigned int num_args, const Location &loc) {
     intrinsic_print(args, num_args, loc);
     std::cout << "\n";
     return {};

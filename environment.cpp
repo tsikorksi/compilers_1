@@ -6,8 +6,7 @@ Environment::Environment(Environment *parent)
   assert(m_parent != this);
 }
 
-Environment::~Environment() {
-}
+Environment::~Environment() = default;
 
 
 // Add new variable to environment

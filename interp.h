@@ -41,9 +41,9 @@ private:
 
     static Value set_variable(Node *ast, const Value &val, Environment *env);
 
-    static Value intrinsic_print(Value *args, unsigned int num_args, const Location &loc);
+    static IntrinsicFn intrinsic_print(Value *args, unsigned int num_args, const Location &loc);
 
-    static Value intrinsic_println(Value *args, unsigned int num_args, const Location &loc);
+    static IntrinsicFn intrinsic_println(Value *args, unsigned int num_args, const Location &loc);
 
     Value call_intrinsic(Node *ast, Environment *env);
 
