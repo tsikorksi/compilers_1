@@ -60,6 +60,7 @@ Value Interpreter::execute_prime(Node *ast, Environment *env) {
     switch (ast->get_tag()) {
         case AST_STATEMENT_LIST:
         {
+            // enter new scope
             Environment new_env(env);
 
             Value final = execute_statement_list(ast, &new_env);
@@ -131,6 +132,7 @@ Value Interpreter::execute_statement_list(Node* ast, Environment* env) {
 void Interpreter::try_if(Node *ast, Environment *env) {
     Value condition = execute_prime(ast->get_kid(0), env);
 
+    // check we are comparing ints
     if (condition.is_numeric()){
         if (condition.get_ival()){
             execute_prime(ast->get_kid(1), env);
@@ -148,6 +150,8 @@ void Interpreter::try_if(Node *ast, Environment *env) {
 
 void Interpreter::try_while(Node *ast, Environment *env) {
     Value condition = execute_prime(ast->get_kid(0), env);
+
+    // check we are comparing ints
     if (condition.is_numeric()) {
         while (condition.get_ival()) {
             execute_prime(ast->get_kid(1), env);
@@ -179,6 +183,7 @@ Value Interpreter::do_math(Node *ast, Environment *env) {
     Value lhs_val = execute_prime(ast->get_kid(0), env);
     Value rhs_val = execute_prime(ast->get_kid(1), env);
 
+    // verify we are doing math on ints
     if (!lhs_val.is_numeric() || !rhs_val.is_numeric()) {
         EvaluationError::raise(ast->get_loc(), "Operand is not numeric");
     }

@@ -1,11 +1,9 @@
 #include "exceptions.h"
 #include "ast.h"
 
-ASTTreePrint::ASTTreePrint() {
-}
+ASTTreePrint::ASTTreePrint() = default;
 
-ASTTreePrint::~ASTTreePrint() {
-}
+ASTTreePrint::~ASTTreePrint() = default;
 
 std::string ASTTreePrint::node_tag_to_string(int tag) const {
     switch (tag) {
