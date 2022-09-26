@@ -50,11 +50,13 @@ private:
 
     void check_condition(Node *ast, Environment *env);
 
-    static IntrinsicFn intrinsic_println(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp);
+    static Value intrinsic_println(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp);
 
-    static IntrinsicFn intrinsic_print(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp);
+    static Value intrinsic_print(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp);
 
     static Value intrinsic_readint(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp);
+
+    void bind_params(Function * fn, Environment * env, Node * arg_list);
 };
 
 #endif // INTERP_H

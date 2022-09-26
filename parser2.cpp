@@ -191,7 +191,6 @@ Node *Parser2::parse_Func() {
     expect_and_discard(TOK_RPAREN);
 
     expect_and_discard(TOK_LBRACE);
-    std::unique_ptr<Node> slist(new Node(AST_STATEMENT_LIST));
     func_ast->append_kid(parse_SList());
     expect_and_discard(TOK_RBRACE);
 
@@ -210,26 +209,27 @@ Node *Parser2::parse_OptPList() {
     if (next_tok != nullptr && next_tok->get_tag() == TOK_IDENTIFIER) {
         // OptPList →   ^PList
         // PList starts with identifier
-        return parse_PList(s.release());
+        return parse_PList();
     }
     // OptPList →   ^ε
     return s.release();
 }
 
 
-Node *Parser2::parse_PList(Node *opt_list_) {
+Node *Parser2::parse_PList() {
     // PList →      ident                                     -- nonempty parameter list
     // PList →      ident , PList
 
-    std::unique_ptr<Node> opt_list(opt_list_);
+    std::unique_ptr<Node> opt_list(new Node(AST_PARAMETER_LIST));
 
 
     opt_list->append_kid(parse_ident());
 
     Node *next_tok = m_lexer->peek(1);
-    if (next_tok->get_tag() == TOK_COMMA) {
+    while (next_tok->get_tag() == TOK_COMMA) {
         expect_and_discard(TOK_COMMA);
-        parse_PList(opt_list.release());
+        opt_list->append_kid(parse_ident());
+        next_tok = m_lexer->peek();
     }
     return opt_list.release();
 }
@@ -262,9 +262,10 @@ Node *Parser2::parse_ArgList(Node *arg_list_) {
     arg_list->append_kid(parse_L());
 
     Node *next_tok = m_lexer->peek(1);
-    if (next_tok->get_tag() == TOK_COMMA) {
+    while (next_tok->get_tag() == TOK_COMMA) {
         expect_and_discard(TOK_COMMA);
-        parse_ArgList(arg_list.release());
+        arg_list->append_kid(parse_L());
+        next_tok = m_lexer->peek();
     }
     return arg_list.release();
 }

@@ -55,9 +55,8 @@ private:
 
     // Parse functions for Lists
 
-    Node *parse_SList(Node *ast);
     Node *parse_OptPList();
-    Node *parse_PList(Node *pNode);
+    Node *parse_PList();
 
 
     // Helper function

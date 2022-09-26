@@ -7,6 +7,11 @@
 #include "function.h"
 #include "interp.h"
 
+
+//interp.cpp: In member function 'void Interpreter::bind_params(Function*, Environment*, Node*)':
+//interp.cpp:159:23: warning: comparison of integer expressions of different signedness: 'int' and 'std::vector<std::__cxx11::basic_string<char> >::size_type' {aka 'long unsigned int'} [-Wsign-compare]
+//  159 |     for (int i = 0; i < params.size(); i++) {
+
 std::unique_ptr<Environment> testing_env (new Environment(nullptr));
 std::unique_ptr<Environment> global_env (new Environment(nullptr));
 
@@ -48,6 +53,7 @@ void Interpreter::add_intrinsic(Environment * env) {
     // Bind all intrinsic functions
     env->bind("print",m_ast->get_loc() , IntrinsicFn (intrinsic_print));
     env->bind("println",m_ast->get_loc() , IntrinsicFn (intrinsic_println));
+    env->bind("readint", m_ast->get_loc(), IntrinsicFn (intrinsic_readint));
 }
 
 Value Interpreter::execute() {
@@ -86,20 +92,39 @@ Value Interpreter::execute_prime(Node *ast, Environment *env) {
                         EvaluationError::raise(ast->get_loc(), "Non-function variable given arguments");
                     case VALUE_INTRINSIC_FN:
                         return call_intrinsic(ast, env);
-                    case VALUE_FUNCTION:
-                        //TODO: user generated functions
-                        return {0};
+                    case VALUE_FUNCTION: {
+                        // extract function from environment
+                        Function * fn = get_variable(ast, env).get_function();
+                        Environment func_env(env);
+                        // bind the parameters to the arguments within the function scope
+                        bind_params(fn, &func_env, ast->get_kid(0));
+                        // execute the ast tree shard
+                        return execute_statement_list(fn->get_body(),&func_env);
+                    }
                 }
             }
             return get_variable(ast, env);
         case AST_VARDEF:
             return define_variable(ast, env);
+        case AST_FUNCTION: {
+            std::vector<std::string> params;
+            // add list of param strings
+            for (unsigned i = 0; i < ast->get_kid(1)->get_num_kids(); i++) {
+                params.push_back(ast->get_kid(1)->get_kid(i)->get_str());
+            }
+            Value fn_val(new Function(ast->get_kid(0)->get_str(), params, env, ast->get_kid(2)));
+            env->bind(fn_val.get_function()->get_name(), ast->get_loc(), fn_val);
+            return {};
+        }
         case AST_INT_LITERAL:
             return int_literal(ast);
         case AST_ASSIGN:
             return set_variable(ast->get_kid(0), execute_prime(ast->get_kid(1), env), env);
         case AST_ARGLIST:{
             EvaluationError::raise(ast->get_loc(),"Argument list made child of non-function call");
+        }
+        case AST_PARAMETER_LIST:{
+            EvaluationError::raise(ast->get_loc(),"Parameter list made child of non-function call");
         }
         case AST_AND:
         case AST_OR:
@@ -127,6 +152,19 @@ Value Interpreter::execute_statement_list(Node* ast, Environment* env) {
         final = execute_prime(ast->get_kid(i), env);
     }
     return final;
+}
+
+void Interpreter::bind_params(Function * fn, Environment * env, Node * arg_list) {
+    std::vector<std::string> params = fn->get_params();
+
+    if (fn->get_params().size() != arg_list->get_num_kids()){
+        EvaluationError::raise(arg_list->get_loc(), "Wrong number of arguments to function %s", fn->get_name().c_str());
+    }
+
+    // bind all parameters to passed in values
+    for (long unsigned int i = 0; i < params.size(); i++) {
+        env->bind(params.at(i),arg_list->get_loc(), execute_prime(arg_list->get_kid(i), env));
+    }
 }
 
 void Interpreter::try_if(Node *ast, Environment *env) {
@@ -297,14 +335,14 @@ Value Interpreter::int_literal(Node * ast) {
 }
 
 
-IntrinsicFn Interpreter::intrinsic_print(Value args[], unsigned num_args, const Location &loc, Interpreter * interp) {
+Value Interpreter::intrinsic_print(Value args[], unsigned num_args, const Location &loc, Interpreter * interp) {
     if (num_args != 1)
         EvaluationError::raise(loc, "Wrong number of arguments passed to print function");
     std::cout << args[0].as_str().c_str();
     return {};
 }
 
-IntrinsicFn Interpreter::intrinsic_println(Value args[], unsigned int num_args, const Location &loc, Interpreter * interp) {
+Value Interpreter::intrinsic_println(Value args[], unsigned int num_args, const Location &loc, Interpreter * interp) {
     intrinsic_print(args, num_args, loc, interp);
     std::cout << "\n";
     return {};
