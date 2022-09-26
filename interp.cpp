@@ -176,8 +176,8 @@ Value Interpreter::set_variable(Node *ast, const Value &val, Environment *env) {
 Value Interpreter::do_math(Node *ast, Environment *env) {
     int tag = ast->get_tag();
 
-    Value lhs_val = execute_prime(ast->get_kid(0), env).get_ival();
-    Value rhs_val = execute_prime(ast->get_kid(1), env).get_ival();
+    Value lhs_val = execute_prime(ast->get_kid(0), env);
+    Value rhs_val = execute_prime(ast->get_kid(1), env);
 
     if (!lhs_val.is_numeric() || !rhs_val.is_numeric()) {
         EvaluationError::raise(ast->get_loc(), "Operand is not numeric");
@@ -206,7 +206,7 @@ Value Interpreter::do_math(Node *ast, Environment *env) {
 Value Interpreter::binary_op(Node *ast, Environment *env) {
 
     int tag = ast->get_tag();
-    Value lhs_val = execute_prime(ast->get_kid(0), env).get_ival();
+    Value lhs_val = execute_prime(ast->get_kid(0), env);
 
     // check something weird isn't being passed in
     if (!lhs_val.is_numeric()){
@@ -230,7 +230,7 @@ Value Interpreter::binary_op(Node *ast, Environment *env) {
             break;
     }
 
-    Value rhs_val = execute_prime(ast->get_kid(1), env).get_ival();
+    Value rhs_val = execute_prime(ast->get_kid(1), env);
 
     // check something weird isn't being passed in
     if (!rhs_val.is_numeric()){
