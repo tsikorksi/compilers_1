@@ -8,17 +8,17 @@ class Location;
 
 class Interpreter {
 private:
-  Node *m_ast;
+    Node *m_ast;
 
 public:
-  explicit Interpreter(Node *ast_to_adopt);
-  ~Interpreter();
+    explicit Interpreter(Node *ast_to_adopt);
+    ~Interpreter();
 
-  void analyze();
-  Value execute();
+    void analyze();
+    Value execute();
 
 private:
-  // TODO: private member functions
+    // TODO: private member functions
 
 
     void search_for_semantic(Node *ast, Environment *test_env);
@@ -41,9 +41,9 @@ private:
 
     static Value set_variable(Node *ast, const Value &val, Environment *env);
 
-    static Value intrinsic_print(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp);
+    static Value intrinsic_print(Value *args, unsigned int num_args, const Location &loc);
 
-    static Value intrinsic_println(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp);
+    static Value intrinsic_println(Value *args, unsigned int num_args, const Location &loc);
 
     Value call_intrinsic(Node *ast, Environment *env);
 

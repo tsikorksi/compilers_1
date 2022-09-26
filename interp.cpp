@@ -1,13 +1,14 @@
 #include <functional>
 #include <iostream>
+#include <memory>
 #include "ast.h"
 #include "node.h"
 #include "exceptions.h"
 #include "function.h"
 #include "interp.h"
 
-Environment testing_env(nullptr);
-Environment global_env(nullptr);
+std::unique_ptr<Environment> testing_env (new Environment(nullptr));
+std::unique_ptr<Environment> global_env (new Environment(nullptr));
 
 Interpreter::Interpreter(Node *ast_to_adopt)
         : m_ast(ast_to_adopt) {
@@ -18,8 +19,8 @@ Interpreter::~Interpreter() {
 }
 
 void Interpreter::analyze() {
-    add_intrinsic(&testing_env);
-    search_for_semantic(m_ast, &testing_env);
+    add_intrinsic(testing_env.get());
+    search_for_semantic(m_ast, testing_env.get());
 }
 
 void Interpreter::search_for_semantic(Node *ast, Environment*test_env) {
@@ -32,9 +33,9 @@ void Interpreter::search_for_semantic(Node *ast, Environment*test_env) {
             test_env->get_variable(ast->get_str(), ast->get_loc());
         case AST_UNIT:
         case AST_STATEMENT_LIST: {
-            auto *new_env = new Environment(test_env);
+            std::unique_ptr<Environment> new_env(new Environment(test_env));
             for (unsigned i = 0; i < ast->get_num_kids(); i++) {
-                search_for_semantic(ast->get_kid(i), new_env);
+                search_for_semantic(ast->get_kid(i), new_env.get());
             }
         }
         default:
@@ -49,8 +50,8 @@ void Interpreter::add_intrinsic(Environment * env) {
 }
 
 Value Interpreter::execute() {
-    add_intrinsic(&global_env);
-    return execute_prime(m_ast, &global_env);
+    add_intrinsic(global_env.get());
+    return execute_prime(m_ast, global_env.get());
 }
 
 Value Interpreter::execute_prime(Node *ast, Environment *env) {
@@ -59,10 +60,9 @@ Value Interpreter::execute_prime(Node *ast, Environment *env) {
     switch (ast->get_tag()) {
         case AST_STATEMENT_LIST:
         {
-            auto *new_env = new Environment(env);
+            Environment new_env(env);
 
-            Value final = execute_statement_list(ast, new_env);
-            //delete new_env;
+            Value final = execute_statement_list(ast, &new_env);
             return final;
         }
         case AST_UNIT:
@@ -291,15 +291,15 @@ Value Interpreter::int_literal(Node * ast) {
 
 
 Value Interpreter::intrinsic_print(Value args[], unsigned num_args,
-                                   const Location &loc, Interpreter *interp) {
+                                   const Location &loc) {
     if (num_args != 1)
         EvaluationError::raise(loc, "Wrong number of arguments passed to print function");
     std::cout << args[0].as_str().c_str();
     return {};
 }
 
-Value Interpreter::intrinsic_println(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
-    intrinsic_print(args, num_args, loc, interp);
+Value Interpreter::intrinsic_println(Value *args, unsigned int num_args, const Location &loc) {
+    intrinsic_print(args, num_args, loc);
     std::cout << "\n";
     return {};
 }
@@ -313,9 +313,9 @@ Value Interpreter::call_intrinsic(Node *ast, Environment *env) {
     Value  args[1] = {arg};
 
     if (name == "print") {
-        return intrinsic_print(args, 1, ast->get_loc(), this);
+        return intrinsic_print(args, 1, ast->get_loc());
     } else if (name == "println") {
-        return intrinsic_println(args, 1, ast->get_loc(), this);
+        return intrinsic_println(args, 1, ast->get_loc());
     }
     return {0};
 }

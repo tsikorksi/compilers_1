@@ -6,7 +6,8 @@ Environment::Environment(Environment *parent)
   assert(m_parent != this);
 }
 
-Environment::~Environment() = default;
+Environment::~Environment() {
+}
 
 
 // Add new variable to environment
@@ -14,7 +15,7 @@ void Environment::new_variable(const std::string& identifier, const Location &lo
     if (Environment::variables.find(identifier) != Environment::variables.end()) {
         SemanticError::raise(loc, "Variable %s already exists", identifier.c_str());
     }
-    Value val = *new Value(kind);
+    Value val = kind;
     Environment::variables.insert({identifier, val});
 }
 
