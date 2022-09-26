@@ -29,9 +29,6 @@ public:
     void bind(const std::string &identifier, const Location &loc, const Value &value);
 
     void new_variable(const std::string &identifier, const Location &loc, ValueKind kind);
-
-    Function *get_function(Node *ast);
-    IntrinsicFn * get_intrinsic(Node * ast);
 };
 
 #endif // ENVIRONMENT_H

@@ -8,10 +8,6 @@
 #include "interp.h"
 
 
-//interp.cpp: In member function 'void Interpreter::bind_params(Function*, Environment*, Node*)':
-//interp.cpp:159:23: warning: comparison of integer expressions of different signedness: 'int' and 'std::vector<std::__cxx11::basic_string<char> >::size_type' {aka 'long unsigned int'} [-Wsign-compare]
-//  159 |     for (int i = 0; i < params.size(); i++) {
-
 std::unique_ptr<Environment> testing_env (new Environment(nullptr));
 std::unique_ptr<Environment> global_env (new Environment(nullptr));
 
@@ -99,7 +95,7 @@ Value Interpreter::execute_prime(Node *ast, Environment *env) {
                         // bind the parameters to the arguments within the function scope
                         bind_params(fn, &func_env, ast->get_kid(0));
                         // execute the ast tree shard
-                        return execute_statement_list(fn->get_body(),&func_env);
+                        return execute_prime(fn->get_body(),&func_env);
                     }
                 }
             }

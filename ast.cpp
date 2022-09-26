@@ -55,8 +55,6 @@ std::string ASTTreePrint::node_tag_to_string(int tag) const {
             return "SLIST";
         case AST_FUNCTION:
             return "FUNC";
-        case AST_FNCALL:
-            return "FNCALL";
         case AST_ARGLIST:
             return "ARGLIST";
         default:

@@ -19,9 +19,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 #include <cstdarg>
-#include <cstdio>
 #include "cpputil.h"
-#include "node.h"
 #include "exceptions.h"
 
 ////////////////////////////////////////////////////////////////////////

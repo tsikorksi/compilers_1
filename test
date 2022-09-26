@@ -1,14 +1,9 @@
-var g;
-g = 42;
-
-function f(x) {
-  x + g;
+function f(a, b) {
+  var b;
+  b = 3;
+  a * b;
 }
 
-function q(x) {
-  var g;
-  g = 17;
-  f(x);
-}
-
-q(1);
+var x;
+x = f(9, 4);
+x;
