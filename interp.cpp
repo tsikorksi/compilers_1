@@ -176,8 +176,15 @@ Value Interpreter::set_variable(Node *ast, const Value &val, Environment *env) {
 Value Interpreter::do_math(Node *ast, Environment *env) {
     int tag = ast->get_tag();
 
-    int lhs = execute_prime(ast->get_kid(0), env).get_ival();
-    int rhs = execute_prime(ast->get_kid(1), env).get_ival();
+    Value lhs_val = execute_prime(ast->get_kid(0), env).get_ival();
+    Value rhs_val = execute_prime(ast->get_kid(1), env).get_ival();
+
+    if (!lhs_val.is_numeric() || !rhs_val.is_numeric()) {
+        EvaluationError::raise(ast->get_loc(), "Operand is not numeric");
+    }
+
+    int lhs = lhs_val.get_ival();
+    int rhs = rhs_val.get_ival();
 
     switch (tag) {
         case AST_ADD:
@@ -199,7 +206,13 @@ Value Interpreter::do_math(Node *ast, Environment *env) {
 Value Interpreter::binary_op(Node *ast, Environment *env) {
 
     int tag = ast->get_tag();
-    int lhs = execute_prime(ast->get_kid(0), env).get_ival();
+    Value lhs_val = execute_prime(ast->get_kid(0), env).get_ival();
+
+    // check something weird isn't being passed in
+    if (!lhs_val.is_numeric()){
+        EvaluationError::raise(ast->get_loc(),"%s passed into binary operation", lhs_val.as_str().c_str());
+    }
+    int lhs = lhs_val.get_ival();
 
     // Short circuit the OR and AND binary operations
     switch (tag) {
@@ -217,7 +230,13 @@ Value Interpreter::binary_op(Node *ast, Environment *env) {
             break;
     }
 
-    int rhs = execute_prime(ast->get_kid(1), env).get_ival();
+    Value rhs_val = execute_prime(ast->get_kid(1), env).get_ival();
+
+    // check something weird isn't being passed in
+    if (!rhs_val.is_numeric()){
+        EvaluationError::raise(ast->get_loc(),"%s passed into binary operation", rhs_val.as_str().c_str());
+    }
+    int rhs = rhs_val.get_ival();
 
     switch (tag) {
         case AST_AND:
@@ -291,7 +310,7 @@ Value Interpreter::call_intrinsic(Node *ast, Environment *env) {
     std::string name = ast->get_str();
     Value arg = execute_prime(ast->get_kid(0), env);
 
-    Value  args[1] = {arg, };
+    Value  args[1] = {arg};
 
     if (name == "print") {
         return intrinsic_print(args, 1, ast->get_loc(), this);
