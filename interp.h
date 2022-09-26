@@ -50,6 +50,8 @@ private:
     void add_intrinsic(Environment * env);
 
     Value execute_statement_list(Node *ast, Environment *env);
+
+    void check_condition(Node *ast, Environment *env);
 };
 
 #endif // INTERP_H

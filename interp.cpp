@@ -45,6 +45,7 @@ void Interpreter::search_for_semantic(Node *ast, Environment*test_env) {
 }
 
 void Interpreter::add_intrinsic(Environment * env) {
+    // Bind all intrinsic functions
     env->bind("print",m_ast->get_loc() , IntrinsicFn (intrinsic_print));
     env->bind("println",m_ast->get_loc() , IntrinsicFn (intrinsic_println));
 }
@@ -84,8 +85,7 @@ Value Interpreter::execute_prime(Node *ast, Environment *env) {
                     case VALUE_INT:
                         EvaluationError::raise(ast->get_loc(), "Non-function variable given arguments");
                     case VALUE_INTRINSIC_FN:
-                        call_intrinsic(ast, env);
-                        return {0};
+                        return call_intrinsic(ast, env);
                     case VALUE_FUNCTION:
                         //TODO: user generated functions
                         return {0};
@@ -130,36 +130,38 @@ Value Interpreter::execute_statement_list(Node* ast, Environment* env) {
 }
 
 void Interpreter::try_if(Node *ast, Environment *env) {
-    Value condition = execute_prime(ast->get_kid(0), env);
+    check_condition(ast, env);
+    if (execute_prime(ast->get_kid(0), env).get_ival()){
+        execute_prime(ast->get_kid(1), env);
 
-    // check we are comparing ints
-    if (condition.is_numeric()){
-        if (condition.get_ival()){
-            execute_prime(ast->get_kid(1), env);
-
-        } else {
-            if (ast->get_num_kids() == 3) {
-                execute_prime(ast->get_kid(2), env);
-            }
-        }
     } else {
-        EvaluationError::raise(ast->get_loc(), "If Statement condition is not numeric");
-
+        // see if there
+        if (ast->get_num_kids() == 3) {
+            execute_prime(ast->get_kid(2), env);
+        }
     }
+
 }
 
 void Interpreter::try_while(Node *ast, Environment *env) {
+    check_condition(ast, env);
+
     Value condition = execute_prime(ast->get_kid(0), env);
 
-    // check we are comparing ints
-    if (condition.is_numeric()) {
-        while (condition.get_ival()) {
-            execute_prime(ast->get_kid(1), env);
-            condition = execute_prime(ast->get_kid(0), env);
-        }
-    } else {
-        EvaluationError::raise(ast->get_loc(), "While Statement condition is not numeric");
+    while (condition.get_ival()) {
+        execute_prime(ast->get_kid(1), env);
+        condition = execute_prime(ast->get_kid(0), env);
     }
+}
+
+void Interpreter::check_condition(Node * ast, Environment *env) {
+
+    Value kind = execute_prime(ast->get_kid(0), env);
+    // check we are using an int as a condition
+    if (kind.is_numeric()) {
+        return;
+    }
+    EvaluationError::raise(ast->get_loc(), "Statement condition is not numeric");
 }
 
 
@@ -321,7 +323,7 @@ Value Interpreter::call_intrinsic(Node *ast, Environment *env) {
     } else if (name == "println") {
         return intrinsic_println(args, 1, ast->get_loc());
     }
-    return {0};
+    return {};
 }
 
 

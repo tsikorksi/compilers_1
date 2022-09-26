@@ -9,7 +9,7 @@ b = 99;
 c = 101;
 d = 103;
 
-if (a) {
+if (print(a)) {
   var b;
   b = 65;
   if (a) {
