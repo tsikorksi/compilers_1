@@ -563,7 +563,7 @@ Node *Parser2::parse_if() {
 
 
 Node *Parser2::parse_while() {
-    // read and create a While Statement
+    // read and create While Statement
     std::unique_ptr<Node> tok(expect(static_cast<enum TokenKind>(TOK_WHILE)));
     std::unique_ptr<Node> ast(new Node(AST_WHILE));
     ast->set_str(tok->get_str());

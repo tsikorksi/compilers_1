@@ -87,6 +87,8 @@ void Lexer::fill(int how_many) {
     }
 }
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "UnreachableCode"
 Node *Lexer::read_token() {
     int c, line = -1, col = -1;
 
@@ -125,8 +127,6 @@ Node *Lexer::read_token() {
     } else if (isdigit(c)) {
         return read_continued_token(TOK_INTEGER_LITERAL, lexeme, line, col, isdigit);
     } else {
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "UnreachableCode"
         switch (c) {
             case '+':
                 return token_create(TOK_PLUS, lexeme, line, col);
@@ -163,9 +163,9 @@ Node *Lexer::read_token() {
             default:
                 SyntaxError::raise(get_current_loc(), "Unrecognized character '%c'", c);
         }
-#pragma clang diagnostic pop
     }
 }
+#pragma clang diagnostic pop
 
 // Helper function to create a Node object to represent a token.
 Node *Lexer::token_create(enum TokenKind kind, const std::string &lexeme, int line, int col) {

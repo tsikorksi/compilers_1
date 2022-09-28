@@ -92,7 +92,7 @@ Value Interpreter::execute_prime(Node *ast, Environment *env) {
                         // TODO: There is an issue with how scope si being deployed, effecting functions being called from another function.
                         // extract function from environment
                         Function * fn = get_variable(ast, env).get_function();
-                        Environment func_env(env);
+                        Environment func_env(fn->get_parent_env());
                         // bind the parameters to the arguments within the function scope
                         bind_params(fn, &func_env, ast->get_kid(0));
                         // execute the ast tree shard
