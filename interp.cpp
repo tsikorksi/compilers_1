@@ -94,7 +94,7 @@ Value Interpreter::execute_prime(Node *ast, Environment *env) {
                         Function * fn = get_variable(ast, env).get_function();
                         Environment func_env(fn->get_parent_env());
                         // bind the parameters to the arguments within the function scope
-                        bind_params(fn, &func_env, ast->get_kid(0));
+                        bind_params(fn, env, ast->get_kid(0));
                         // execute the ast tree shard
                         return execute_prime(fn->get_body(),&func_env);
                     }
@@ -109,7 +109,7 @@ Value Interpreter::execute_prime(Node *ast, Environment *env) {
             for (unsigned i = 0; i < ast->get_kid(1)->get_num_kids(); i++) {
                 params.push_back(ast->get_kid(1)->get_kid(i)->get_str());
             }
-            Value fn_val(new Function(ast->get_kid(0)->get_str(), params, env, ast->get_kid(2)));
+            Value fn_val(new Function(ast->get_kid(0)->get_str(), params, global_env.get(), ast->get_kid(2)));
             env->bind(fn_val.get_function()->get_name(), ast->get_loc(), fn_val);
             return {};
         }
