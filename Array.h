@@ -10,7 +10,7 @@
 #include <vector>
 
 
-class Array : public  ValRep{
+class Array : public ValRep{
 private:
     explicit Array();
 

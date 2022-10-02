@@ -60,6 +60,8 @@ std::string Value::as_str() const {
             return cpputil::format("<function %s>", m_rep->as_function()->get_name().c_str());
         case VALUE_INTRINSIC_FN:
             return "<intrinsic function>";
+        case VALUE_ARRAY:
+            return cpputil::format("test %s", m_rep->as_array()->get(0).as_str().c_str());
         default:
             // this should not happen
             RuntimeError::raise("Unknown value type %d", int(m_kind));

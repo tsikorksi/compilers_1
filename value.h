@@ -14,6 +14,8 @@ enum ValueKind {
   // dynamic values: these have an associated dynamically-allocated
   // object (drived from ValRep)
   VALUE_FUNCTION,
+  VALUE_ARRAY,
+  VALUE_STRING
   // could add other kinds of dynamic values here
 };
 
