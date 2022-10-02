@@ -356,7 +356,7 @@ Value Interpreter::string_literal(Node * ast) {
 Value Interpreter::intrinsic_print(Value args[], unsigned num_args, const Location &loc, Interpreter * interp) {
     if (num_args != 1)
         EvaluationError::raise(loc, "Wrong number of arguments passed to print function");
-    std::cout << args[0].as_str().c_str();
+    std::cout << args[0].as_str();
     return {};
 }
 

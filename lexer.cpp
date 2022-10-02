@@ -252,6 +252,25 @@ Node *Lexer::read_multi_string(const std::string &lexeme, int line, int col) {
     int next_c = read();
     std::string word;
     while (next_c != '"'){
+        if (next_c == '\\') {
+            int next_next = read();
+            switch (next_next) {
+                case '"':
+                    next_c = '\"';
+                    break;
+                case 'n':
+                    next_c = '\n';
+                    break;
+                case 'r':
+                    next_c = '\r';
+                    break;
+                case 't':
+                    next_c = '\t';
+                    break;
+                default:
+                    unread(next_next);
+            }
+        }
         word.push_back(next_c);
         next_c = read();
     }

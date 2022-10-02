@@ -58,17 +58,22 @@ private:
     Node *parse_OptPList();
     Node *parse_PList();
 
-
-    // Helper function
-    ASTKind tok_to_ast(TokenKind tag);
-
+    // Parse functions for functions
 
     Node *parse_OptArgList();
     Node *parse_ArgList(Node *arg_list_);
-
     Node *parse_function();
-
     Node *parse_SList();
+
+
+    // Helper function
+    ASTKind tok_to_ast(TokenKind tag);
+    static bool valid_operand(int tok);
+
+
+
+
+
 };
 
 #endif // PARSER2_H
