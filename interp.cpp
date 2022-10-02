@@ -50,6 +50,7 @@ void Interpreter::add_intrinsic(Environment * env) {
     env->bind("print",m_ast->get_loc() , IntrinsicFn (intrinsic_print));
     env->bind("println",m_ast->get_loc() , IntrinsicFn (intrinsic_println));
     env->bind("readint", m_ast->get_loc(), IntrinsicFn (intrinsic_readint));
+    env->bind("mkarr", m_ast->get_loc(), IntrinsicFn (intrinsic_mkarr));
 }
 
 Value Interpreter::execute() {
@@ -84,8 +85,7 @@ Value Interpreter::execute_prime(Node *ast, Environment *env) {
         case AST_VARREF:
             if (ast->get_num_kids() != 0 && ast->get_kid(0)->get_tag() == AST_ARGLIST) {
                 switch (get_variable(ast, env).get_kind()) {
-                    case VALUE_INT:
-                        EvaluationError::raise(ast->get_loc(), "Non-function variable given arguments");
+
                     case VALUE_INTRINSIC_FN:
                         return call_intrinsic(ast, env);
                     case VALUE_FUNCTION: {
@@ -98,6 +98,10 @@ Value Interpreter::execute_prime(Node *ast, Environment *env) {
                         // execute the ast tree shard
                         return execute_prime(fn->get_body(),&func_env);
                     }
+                    case VALUE_ARRAY:
+                    case VALUE_STRING:
+                    case VALUE_INT:
+                        EvaluationError::raise(ast->get_loc(), "Non-function variable given arguments");
                 }
             }
             return get_variable(ast, env);
@@ -357,6 +361,26 @@ Value Interpreter::intrinsic_readint(Value args[], unsigned int num_args, const 
     }
     return {input};
 }
+
+Value Interpreter::intrinsic_mkarr(Value args[], unsigned int num_args, const Location &loc, Interpreter * interp) {
+
+}
+
+Value Interpreter::intrinsic_len(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
+}
+
+Value Interpreter::intrinsic_get(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
+}
+
+Value Interpreter::intrinsic_set(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
+}
+
+Value Interpreter::intrinsic_push(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
+}
+
+Value Interpreter::intrinsic_pop(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
+}
+
 
 Value Interpreter::call_intrinsic(Node *ast, Environment *env) {
 

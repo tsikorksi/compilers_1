@@ -56,7 +56,18 @@ private:
 
     static Value intrinsic_readint(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp);
 
+    // Array funcs
+    static Value intrinsic_mkarr(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp);
+    static Value intrinsic_len(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp);
+    static Value intrinsic_get(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp);
+    static Value intrinsic_set(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp);
+    static Value intrinsic_push(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp);
+    static Value intrinsic_pop(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp);
+
     void bind_params(Function * fn, Environment * env, Node * arg_list);
+
+
+
 };
 
 #endif // INTERP_H
