@@ -6,6 +6,7 @@
 #include "exceptions.h"
 #include "function.h"
 #include "interp.h"
+#include "array.h"
 
 
 std::unique_ptr<Environment> testing_env (new Environment(nullptr));
@@ -47,10 +48,18 @@ void Interpreter::search_for_semantic(Node *ast, Environment*test_env) {
 
 void Interpreter::add_intrinsic(Environment * env) {
     // Bind all intrinsic functions
+    // I/O
     env->bind("print",m_ast->get_loc() , IntrinsicFn (intrinsic_print));
     env->bind("println",m_ast->get_loc() , IntrinsicFn (intrinsic_println));
     env->bind("readint", m_ast->get_loc(), IntrinsicFn (intrinsic_readint));
+    // Arrays
     env->bind("mkarr", m_ast->get_loc(), IntrinsicFn (intrinsic_mkarr));
+    env->bind("len", m_ast->get_loc(), IntrinsicFn (intrinsic_len));
+    env->bind("get", m_ast->get_loc(), IntrinsicFn (intrinsic_get));
+    env->bind("set", m_ast->get_loc(), IntrinsicFn (intrinsic_set));
+    env->bind("pop", m_ast->get_loc(), IntrinsicFn (intrinsic_pop));
+    env->bind("push", m_ast->get_loc(), IntrinsicFn (intrinsic_push));
+    // Strings
 }
 
 Value Interpreter::execute() {
@@ -363,22 +372,59 @@ Value Interpreter::intrinsic_readint(Value args[], unsigned int num_args, const 
 }
 
 Value Interpreter::intrinsic_mkarr(Value args[], unsigned int num_args, const Location &loc, Interpreter * interp) {
-
+    Array arr = Array();
+    for (int i = 0; i < num_args; i++) {
+        arr.push(args[i]);
+    }
+    return {&arr};
 }
 
 Value Interpreter::intrinsic_len(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
+    if (num_args != 1)
+        EvaluationError::raise(loc, "Wrong number of arguments to length check call");
+    if (args[0].get_kind() != VALUE_ARRAY)
+        EvaluationError::raise(loc, "Length call not passed array type");
+
+    return args[0].get_array()->len();
 }
 
 Value Interpreter::intrinsic_get(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
+    if (num_args != 2)
+        EvaluationError::raise(loc, "Wrong number of arguments to array get call");
+    if (args[0].get_kind() != VALUE_ARRAY)
+        EvaluationError::raise(loc, "Get call not passed array type");
+    if (args[1].get_kind() != VALUE_INT)
+        EvaluationError::raise(loc, "Get call not passed int for index");
+    return args[0].get_array()->get(args[1].get_ival());
+
 }
 
 Value Interpreter::intrinsic_set(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
+    if (num_args != 3)
+        EvaluationError::raise(loc, "Wrong number of arguments to array set call");
+    if (args[0].get_kind() != VALUE_ARRAY)
+        EvaluationError::raise(loc, "Set call not passed array type");
+    if (args[1].get_kind() != VALUE_INT)
+        EvaluationError::raise(loc, "Set call not passed int for index");
+    args[0].get_array()->set(args[1].get_ival(), args[2]);
+    return args[2];
 }
 
 Value Interpreter::intrinsic_push(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
+    if (num_args != 2)
+        EvaluationError::raise(loc, "Wrong number of arguments to array push call");
+    if (args[0].get_kind() != VALUE_ARRAY)
+        EvaluationError::raise(loc, "Push call not passed array type");
+    args[0].get_array()->push(args[1]);
+    return args[1];
 }
 
 Value Interpreter::intrinsic_pop(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
+    if (num_args != 1)
+        EvaluationError::raise(loc, "Wrong number of arguments to array pop call");
+    if (args[0].get_kind() != VALUE_ARRAY)
+        EvaluationError::raise(loc, "Pop call not passed array type");
+    return args[0].get_array()->pop();
 }
 
 

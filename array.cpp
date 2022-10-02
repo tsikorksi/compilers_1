@@ -18,17 +18,17 @@ Value Array::len() const {
 
 Value Array::set(int index, const Value& val) {
     m_array.at(index) = val;
-    return {m_array.at(index)};
+    return m_array.at(index);
 }
 
 Value Array::get(int index) {
-    return {m_array.at(index)};
+    return m_array.at(index);
 }
 
 Value Array::pop() {
     Value back = m_array.back();
     m_array.pop_back();
-    return {back};
+    return back;
 }
 
 

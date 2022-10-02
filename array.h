@@ -12,11 +12,10 @@
 
 class Array : public ValRep{
 private:
-    explicit Array();
 
     std::vector<Value> m_array;
 public:
-
+    explicit Array();
     Value len() const;
     void push(const Value &val);
     Value set(int index, const Value& val);
