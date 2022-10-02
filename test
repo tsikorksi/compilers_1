@@ -1,12 +1,13 @@
-var year;
 var a;
+var b;
 
-year = 2008;
-a = 0;
-if (( (year / 4) * 4 == year &&
-      (year / 100) * 100 != year ) ||
-    (year / 400) * 400 == year) {
-  a = 1;
-}
+a = "ba";
+b = "na";
 
-a;
+var c;
+c = strcat(b, b);
+
+var d;
+d = strcat(a, c);
+println(d);
+45;
