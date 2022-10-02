@@ -31,6 +31,9 @@ private:
 
 public:
     ValRep(ValRepKind kind);
+
+    ValRep();
+
     virtual ~ValRep();
 
     ValRepKind get_kind() const { return m_kind; }

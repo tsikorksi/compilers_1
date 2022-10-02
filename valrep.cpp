@@ -25,3 +25,4 @@ String *ValRep::as_string() {
     assert(m_kind == VALREP_STRING);
     return static_cast<String *>(this);
 }
+

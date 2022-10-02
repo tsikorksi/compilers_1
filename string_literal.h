@@ -12,10 +12,13 @@
 class String : public ValRep {
 private:
     explicit String();
+    String(std::string);
     std::string m_string;
 public:
     Value len() const;
     std::string get_str();
+    //String strcat(String other);
+    //String substr(int start, int end);
 
 };
 
