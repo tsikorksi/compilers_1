@@ -11,11 +11,14 @@
 
 class String : public ValRep {
 private:
-    explicit String();
     std::string m_string;
 public:
+    String();
+    explicit String(std::string in);
     Value len() const;
     std::string get_str();
+    void set_str(std::string in);
+    void set_str(String in);
     //String strcat(String other);
     //String substr(int start, int end);
 

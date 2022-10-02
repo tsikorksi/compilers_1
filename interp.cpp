@@ -7,6 +7,7 @@
 #include "function.h"
 #include "interp.h"
 #include "array.h"
+#include "string_literal.h"
 
 
 std::unique_ptr<Environment> testing_env (new Environment(nullptr));
@@ -128,6 +129,8 @@ Value Interpreter::execute_prime(Node *ast, Environment *env) {
         }
         case AST_INT_LITERAL:
             return int_literal(ast);
+        case AST_STRING:
+            return string_literal(ast);
         case AST_ASSIGN:
             return set_variable(ast->get_kid(0), execute_prime(ast->get_kid(1), env), env);
         case AST_ARGLIST:{
@@ -342,6 +345,11 @@ Value Interpreter::binary_op(Node *ast, Environment *env) {
 
 Value Interpreter::int_literal(Node * ast) {
     return {std::stoi(ast->get_str())};
+}
+
+Value Interpreter::string_literal(Node * ast) {
+    Value str = new String(ast->get_str());
+    return str;
 }
 
 

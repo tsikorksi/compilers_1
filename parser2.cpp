@@ -57,6 +57,7 @@
 // T' -> / F T'
 // T' -> epsilon
 // F -> number
+// F → string_literal
 // F -> ident
 // F -> ( A )
 
@@ -477,6 +478,7 @@ Node *Parser2::parse_F() {
     // F -> ^ ident
     // F -> ^ ident ( OptArgList )     -- function call
     // F -> ^ ( A )
+    // F -> string_literal
 
     Node *next_tok = m_lexer->peek();
     Node *next_next_tok = m_lexer->peek(2);
@@ -485,7 +487,7 @@ Node *Parser2::parse_F() {
     }
 
     int tag = next_tok->get_tag();
-    if (tag == TOK_INTEGER_LITERAL || tag == TOK_IDENTIFIER) {
+    if (tag == TOK_INTEGER_LITERAL || tag == TOK_IDENTIFIER || tag == TOK_STRING) {
         // F -> ^ number
         // F -> ^ ident
         std::unique_ptr<Node> tok(expect(static_cast<enum TokenKind>(tag)));

@@ -67,7 +67,7 @@ private:
     void bind_params(Function * fn, Environment * env, Node * arg_list);
 
 
-
+    static Value string_literal(Node *ast);
 };
 
 #endif // INTERP_H
