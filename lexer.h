@@ -46,6 +46,7 @@ private:
 
     Node *read_multi_greater(const std::string &lexeme, int line, int col);
 
+    Node *read_multi_string(const std::string &lexeme, int line, int col);
 };
 
 #endif // LEXER_H

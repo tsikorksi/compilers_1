@@ -25,6 +25,8 @@ std::string ASTTreePrint::node_tag_to_string(int tag) const {
             return "VARDEF";
         case AST_INT_LITERAL:
             return "INT_LITERAL";
+        case AST_STRING:
+            return "STRING";
         case AST_ASSIGN:
             return "ASSIGN";
         case AST_AND:

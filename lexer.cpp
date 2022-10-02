@@ -160,6 +160,8 @@ Node *Lexer::read_token() {
                 return read_continued_token(TOK_AND, lexeme, line, col, ispunct);
             case '!':
                 return read_continued_token(TOK_NOTEQUAL, lexeme, line, col, ispunct);
+            case '"':
+                return read_multi_string(lexeme, line, col);
             default:
                 SyntaxError::raise(get_current_loc(), "Unrecognized character '%c'", c);
         }
@@ -246,6 +248,16 @@ Node *Lexer::read_multi_greater(const std::string &lexeme, int line, int col) {
     return token_create(kind, lexeme, line, col);
 }
 
+Node *Lexer::read_multi_string(const std::string &lexeme, int line, int col) {
+    int next_c = read();
+    std::string word;
+    while (next_c != '"'){
+        word.push_back(next_c);
+        next_c = read();
+    }
+    return token_create(TOK_STRING, word, line, col);
+}
+
 std::string Lexer::node_tag_to_string(int tag) {
     // was used for debugging, will keep in case of future modifications to lexer
     switch (tag) {
@@ -265,6 +277,8 @@ std::string Lexer::node_tag_to_string(int tag) {
             return "ASSIGN";
         case TOK_INTEGER_LITERAL:
             return "INT_LITERAL";
+        case TOK_STRING:
+            return "STRING";
         case TOK_PLUS:
             return "ADD";
         case TOK_MINUS:

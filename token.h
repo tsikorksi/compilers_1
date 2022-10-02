@@ -9,6 +9,7 @@ enum TokenKind {
     TOK_VAR,
     TOK_ASSIGN,
     TOK_INTEGER_LITERAL,
+    TOK_STRING,
     TOK_PLUS,
     TOK_MINUS,
     TOK_TIMES,
