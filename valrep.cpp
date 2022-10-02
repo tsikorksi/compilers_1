@@ -1,6 +1,6 @@
 #include "function.h"
 #include "valrep.h"
-#include "Array.h"
+#include "array.h"
 
 ValRep::ValRep(ValRepKind kind)
   : m_kind(kind)

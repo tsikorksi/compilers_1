@@ -2,7 +2,7 @@
 #include "exceptions.h"
 #include "valrep.h"
 #include "function.h"
-#include "Array.h"
+#include "array.h"
 #include "value.h"
 
 Value::Value(int ival)
