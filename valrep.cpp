@@ -1,7 +1,7 @@
 #include "function.h"
-#include "valrep.h"
 #include "string_literal.h"
 #include "array.h"
+#include "valrep.h"
 
 ValRep::ValRep(ValRepKind kind)
   : m_kind(kind)

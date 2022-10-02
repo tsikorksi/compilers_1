@@ -8,9 +8,9 @@ String::String() : ValRep(VALREP_STRING){
 
 }
 
-String::String(std::string input) {
-    m_string = input;
-}
+//String::String(std::string input) {
+//    m_string = input;
+//}
 
 Value String::len() const {
     return {static_cast<int>(m_string.length())};
@@ -19,6 +19,8 @@ Value String::len() const {
 std::string String::get_str() {
     return m_string;
 }
+
+
 
 
 

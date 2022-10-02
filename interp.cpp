@@ -372,11 +372,11 @@ Value Interpreter::intrinsic_readint(Value args[], unsigned int num_args, const 
 }
 
 Value Interpreter::intrinsic_mkarr(Value args[], unsigned int num_args, const Location &loc, Interpreter * interp) {
-    Array arr = Array();
-    for (int i = 0; i < num_args; i++) {
-        arr.push(args[i]);
+    Value arr = new Array();
+    for (unsigned int i = 0; i < num_args; i++) {
+        arr.get_array()->push(args[i]);
     }
-    return {&arr};
+    return arr;
 }
 
 Value Interpreter::intrinsic_len(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
