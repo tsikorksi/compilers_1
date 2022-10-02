@@ -61,6 +61,9 @@ void Interpreter::add_intrinsic(Environment * env) {
     env->bind("pop", m_ast->get_loc(), IntrinsicFn (intrinsic_pop));
     env->bind("push", m_ast->get_loc(), IntrinsicFn (intrinsic_push));
     // Strings
+    env->bind("strlen", m_ast->get_loc(), IntrinsicFn (intrinsic_strlen));
+    env->bind("strcat", m_ast->get_loc(), IntrinsicFn (intrinsic_strcat));
+    env->bind("substr", m_ast->get_loc(), IntrinsicFn (intrinsic_substr));
 }
 
 Value Interpreter::execute() {
@@ -378,6 +381,38 @@ Value Interpreter::intrinsic_readint(Value args[], unsigned int num_args, const 
     }
     return {input};
 }
+
+
+Value Interpreter::intrinsic_strlen(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
+    if (num_args != 1)
+        EvaluationError::raise(loc, "Wrong number of arguments passed to strlen function");
+    if (args[0].get_kind() != VALUE_STRING)
+        EvaluationError::raise(loc, "strlen function not passed String");
+    return args[0].get_string()->len();
+}
+
+Value Interpreter::intrinsic_strcat(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
+    if (num_args != 2)
+        EvaluationError::raise(loc, "Wrong number of arguments passed to strcat function");
+    if (args[0].get_kind() != VALUE_STRING)
+        EvaluationError::raise(loc, "strcat function not passed String in first argument");
+    if (args[1].get_kind() != VALUE_STRING)
+        EvaluationError::raise(loc, "strcat function not passed String in second argument");
+    return new String(args[0].get_string()->get_str() + args[1].get_string()->get_str());
+}
+
+Value Interpreter::intrinsic_substr(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
+    if (num_args != 3)
+        EvaluationError::raise(loc, "Wrong number of arguments passed to substr function");
+    if (args[0].get_kind() != VALUE_STRING)
+        EvaluationError::raise(loc, "substr function not passed String in first argument");
+    if (!args[1].is_numeric())
+        EvaluationError::raise(loc, "substr function not passed int in second argument");
+    if (!args[2].is_numeric())
+        EvaluationError::raise(loc, "substr function not passed int in third argument");
+    return new String(args[0].get_string()->get_str().substr(args[1].get_ival(), args[2].get_ival()));
+}
+
 
 Value Interpreter::intrinsic_mkarr(Value args[], unsigned int num_args, const Location &loc, Interpreter * interp) {
     Value arr = new Array();
