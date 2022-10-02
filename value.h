@@ -2,8 +2,11 @@
 #define VALUE_H
 
 #include <cassert>
+#include <string>
 class ValRep;
 class Function;
+class Array;
+
 
 enum ValueKind {
   // "atomic" values
@@ -48,6 +51,7 @@ private:
 public:
   Value(int ival = 0);
   Value(Function *fn);
+  Value(Array *ar);
   Value(IntrinsicFn intrinsic_fn);
   Value(const Value &other);
   ~Value();
@@ -66,6 +70,7 @@ public:
   }
 
   Function *get_function() const;
+  Array *get_array() const;
 
   IntrinsicFn get_intrinsic_fn() const {
     assert(m_kind == VALUE_INTRINSIC_FN);

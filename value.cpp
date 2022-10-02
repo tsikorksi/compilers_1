@@ -2,6 +2,7 @@
 #include "exceptions.h"
 #include "valrep.h"
 #include "function.h"
+#include "Array.h"
 #include "value.h"
 
 Value::Value(int ival)
@@ -19,6 +20,13 @@ Value::Value(IntrinsicFn intrinsic_fn)
         : m_kind(VALUE_INTRINSIC_FN) {
     m_atomic.intrinsic_fn = intrinsic_fn;
 }
+
+Value::Value(Array *ar)
+        : m_kind(VALUE_ARRAY)
+        , m_rep(ar) {
+    m_rep = ar;
+}
+
 
 Value::Value(const Value &other)
         : m_kind(VALUE_INT) {
@@ -52,6 +60,11 @@ Function *Value::get_function() const {
     return m_rep->as_function();
 }
 
+Array *Value::get_array() const {
+    assert(m_kind == VALUE_ARRAY);
+    return m_rep->as_array();
+}
+
 std::string Value::as_str() const {
     switch (m_kind) {
         case VALUE_INT:
@@ -61,7 +74,7 @@ std::string Value::as_str() const {
         case VALUE_INTRINSIC_FN:
             return "<intrinsic function>";
         case VALUE_ARRAY:
-            return cpputil::format("test %s", m_rep->as_array()->get(0).as_str().c_str());
+            return "test";
         default:
             // this should not happen
             RuntimeError::raise("Unknown value type %d", int(m_kind));
