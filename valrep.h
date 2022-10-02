@@ -11,6 +11,8 @@ class Function;
 
 enum ValRepKind {
   VALREP_FUNCTION,
+  VALREP_ARRAY,
+  VALREP_STRING,
   // other kinds of valreps (e.g., vector, string, etc.) could be added
 };
 
