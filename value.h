@@ -77,7 +77,7 @@ public:
     return m_atomic.intrinsic_fn;
   }
 
-  // convert to a string representation
+  // convert to a string_literal representation
   std::string as_str() const;
 
   bool is_numeric() const { return m_kind == VALUE_INT; }

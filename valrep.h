@@ -14,7 +14,7 @@ class Array;
 enum ValRepKind {
     VALREP_FUNCTION,
     VALREP_ARRAY,
-    // other kinds of valreps (e.g., vector, string, etc.) could be added
+    // other kinds of valreps (e.g., vector, string_literal, etc.) could be added
 };
 
 class ValRep {
