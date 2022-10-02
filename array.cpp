@@ -3,7 +3,6 @@
 //
 
 #include "array.h"
-#include "exceptions.h"
 
 
 Array::Array() : ValRep(VALREP_ARRAY) {

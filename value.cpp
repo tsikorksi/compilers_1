@@ -3,6 +3,7 @@
 #include "valrep.h"
 #include "function.h"
 #include "array.h"
+#include "string_literal.h"
 #include "value.h"
 
 Value::Value(int ival)
@@ -25,6 +26,12 @@ Value::Value(Array *ar)
         : m_kind(VALUE_ARRAY)
         , m_rep(ar) {
     m_rep = ar;
+}
+
+Value::Value(String *st)
+        : m_kind(VALUE_STRING)
+        , m_rep(st) {
+    m_rep = st;
 }
 
 
@@ -73,12 +80,29 @@ std::string Value::as_str() const {
             return cpputil::format("<function %s>", m_rep->as_function()->get_name().c_str());
         case VALUE_INTRINSIC_FN:
             return "<intrinsic function>";
-        case VALUE_ARRAY:
-            return "test";
+        case VALUE_ARRAY: {
+            std::string out;
+            out.push_back('[');
+            for (int i = 0; i < m_rep->as_array()->len().get_ival(); i++) {
+                out.push_back(m_rep->as_array()->get(i).as_str().at(0));
+                out.push_back(',');
+                out.push_back(' ');
+            }
+            out.push_back(']');
+            return out;
+        }
+
+        case VALUE_STRING:
+            return cpputil::format("%s", m_rep->as_string()->get_str().c_str());
         default:
             // this should not happen
             RuntimeError::raise("Unknown value type %d", int(m_kind));
     }
+}
+
+String *Value::get_string() const {
+    assert(m_kind == VALUE_STRING);
+    return m_rep->as_string();
 }
 
 // TODO: implementations of additional member functions

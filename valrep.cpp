@@ -1,5 +1,6 @@
 #include "function.h"
 #include "valrep.h"
+#include "string_literal.h"
 #include "array.h"
 
 ValRep::ValRep(ValRepKind kind)
@@ -18,4 +19,9 @@ Function *ValRep::as_function() {
 Array *ValRep::as_array() {
     assert(m_kind == VALREP_ARRAY);
     return static_cast<Array *>(this);
+}
+
+String *ValRep::as_string() {
+    assert(m_kind == VALREP_STRING);
+    return static_cast<String *>(this);
 }

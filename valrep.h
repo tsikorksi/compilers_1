@@ -5,6 +5,8 @@
 
 class Function;
 class Array;
+class String;
+
 
 // A "ValRep" (value representation) is a type used as
 // a dynamically-allocated object serving as the representation
@@ -14,7 +16,8 @@ class Array;
 enum ValRepKind {
     VALREP_FUNCTION,
     VALREP_ARRAY,
-    // other kinds of valreps (e.g., vector, string_literal, etc.) could be added
+    VALREP_STRING,
+    // other kinds of valreps (e.g., vector, String, etc.) could be added
 };
 
 class ValRep {
@@ -50,6 +53,8 @@ public:
     Function *as_function();
 
     Array *as_array();
+
+    String *as_string();
 };
 
 #endif

@@ -6,6 +6,7 @@
 class ValRep;
 class Function;
 class Array;
+class String;
 
 
 enum ValueKind {
@@ -15,7 +16,7 @@ enum ValueKind {
   // could other kinds of atomic values here
 
   // dynamic values: these have an associated dynamically-allocated
-  // object (drived from ValRep)
+  // object (derived from ValRep)
   VALUE_FUNCTION,
   VALUE_ARRAY,
   VALUE_STRING
@@ -42,7 +43,7 @@ union Atomic {
 
 class Value {
 private:
-  ValueKind m_kind;
+    ValueKind m_kind;
   union {
     Atomic m_atomic; // for "atomic" values
     ValRep *m_rep;   // for "dynamic" values (pointer to associated ValRep object)
@@ -52,6 +53,7 @@ public:
   Value(int ival = 0);
   Value(Function *fn);
   Value(Array *ar);
+  Value(String *st);
   Value(IntrinsicFn intrinsic_fn);
   Value(const Value &other);
   ~Value();
@@ -71,13 +73,14 @@ public:
 
   Function *get_function() const;
   Array *get_array() const;
+  String *get_string() const;
 
   IntrinsicFn get_intrinsic_fn() const {
     assert(m_kind == VALUE_INTRINSIC_FN);
     return m_atomic.intrinsic_fn;
   }
 
-  // convert to a string_literal representation
+  // convert to a string representation
   std::string as_str() const;
 
   bool is_numeric() const { return m_kind == VALUE_INT; }
