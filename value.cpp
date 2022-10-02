@@ -83,17 +83,18 @@ std::string Value::as_str() const {
         case VALUE_ARRAY: {
             std::string out;
             out.push_back('[');
-            for (int i = 0; i < m_rep->as_array()->len().get_ival(); i++) {
+            for (int i = 0; i < m_rep->as_array()->len().get_ival() - 1; i++) {
                 out.push_back(m_rep->as_array()->get(i).as_str().at(0));
                 out.push_back(',');
                 out.push_back(' ');
             }
+            out.push_back(m_rep->as_array()->get(m_rep->as_array()->len().get_ival() - 1).as_str().at(0));
             out.push_back(']');
             return out;
         }
 
         case VALUE_STRING:
-            return cpputil::format("%s", m_rep->as_string()->get_str().c_str());
+            return m_rep->as_string()->get_str();
         default:
             // this should not happen
             RuntimeError::raise("Unknown value type %d", int(m_kind));

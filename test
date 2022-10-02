@@ -1,13 +1,3 @@
 var a;
-var b;
-
-a = "ba";
-b = "na";
-
-var c;
-c = strcat(b, b);
-
-var d;
-d = strcat(a, c);
-println(d);
-45;
+a = mkarr(1, 2, 3);
+print(a);
