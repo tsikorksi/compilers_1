@@ -1,3 +1,4 @@
+#include <iostream>
 #include "cpputil.h"
 #include "exceptions.h"
 #include "valrep.h"
@@ -84,13 +85,12 @@ std::string Value::as_str() const {
             std::string out;
             out.push_back('[');
             for (int i = 0; i < m_rep->as_array()->len().get_ival() - 1; i++) {
-                for (unsigned int j = 0; j < m_rep->as_array()->get(i).as_str().length(); j++){
-                    out.push_back(m_rep->as_array()->get(i).as_str().at(j));
-                }
+                out += m_rep->as_array()->get(i).as_str();
                 out.push_back(',');
                 out.push_back(' ');
             }
-            out.push_back(m_rep->as_array()->get(m_rep->as_array()->len().get_ival() - 1).as_str().at(0));
+            out += m_rep->as_array()->get(m_rep->as_array()->len().get_ival() - 1).as_str();
+
             out.push_back(']');
             return out;
         }

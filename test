@@ -1,4 +1,7 @@
 var a;
-a = mkarr("test", 2, 3);
+function b() {
+ 54;
+}
+a = mkarr("test", 2, 3, 524251);
 println(a);
 42;
