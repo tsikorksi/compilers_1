@@ -88,7 +88,6 @@ public:
   bool is_atomic() const  { return !is_dynamic(); }
 
 private:
-  // TODO: add additional member functions, if necessary
 };
 
 #endif // VALUE_H
