@@ -29,7 +29,7 @@ enum ValueKind {
 class Value;
 class Location;
 class Interpreter;
-typedef Value (*IntrinsicFn)(Value args[], unsigned num_args, const Location &loc, Interpreter *interp);
+typedef Value (*IntrinsicFn)(Value args[], unsigned num_args, const Location &loc);
 
 // An "atomic" value that doesn't require a separate
 // (dynamically-allocated) representation

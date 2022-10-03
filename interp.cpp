@@ -355,20 +355,20 @@ Value Interpreter::string_literal(Node * ast) {
 }
 
 
-Value Interpreter::intrinsic_print(Value args[], unsigned num_args, const Location &loc, Interpreter * interp) {
+Value Interpreter::intrinsic_print(Value args[], unsigned num_args, const Location &loc) {
     if (num_args != 1)
         EvaluationError::raise(loc, "Wrong number of arguments passed to print function");
     std::cout << args[0].as_str();
     return {};
 }
 
-Value Interpreter::intrinsic_println(Value args[], unsigned int num_args, const Location &loc, Interpreter * interp) {
-    intrinsic_print(args, num_args, loc, interp);
+Value Interpreter::intrinsic_println(Value args[], unsigned int num_args, const Location &loc) {
+    intrinsic_print(args, num_args, loc);
     std::cout << "\n";
     return {};
 }
 
-Value Interpreter::intrinsic_readint(Value args[], unsigned int num_args, const Location &loc, Interpreter * interp) {
+Value Interpreter::intrinsic_readint(Value args[], unsigned int num_args, const Location &loc) {
     if (num_args != 0)
         EvaluationError::raise(loc, "Wrong number of arguments passed to readint function");
     int input = 0;
@@ -382,7 +382,7 @@ Value Interpreter::intrinsic_readint(Value args[], unsigned int num_args, const 
 }
 
 
-Value Interpreter::intrinsic_strlen(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
+Value Interpreter::intrinsic_strlen(Value *args, unsigned int num_args, const Location &loc) {
     if (num_args != 1)
         EvaluationError::raise(loc, "Wrong number of arguments passed to strlen function");
     if (args[0].get_kind() != VALUE_STRING)
@@ -390,7 +390,7 @@ Value Interpreter::intrinsic_strlen(Value *args, unsigned int num_args, const Lo
     return args[0].get_string()->len();
 }
 
-Value Interpreter::intrinsic_strcat(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
+Value Interpreter::intrinsic_strcat(Value *args, unsigned int num_args, const Location &loc) {
     if (num_args != 2)
         EvaluationError::raise(loc, "Wrong number of arguments passed to strcat function");
     if (args[0].get_kind() != VALUE_STRING)
@@ -400,7 +400,7 @@ Value Interpreter::intrinsic_strcat(Value *args, unsigned int num_args, const Lo
     return new String(args[0].get_string()->get_str() + args[1].get_string()->get_str());
 }
 
-Value Interpreter::intrinsic_substr(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
+Value Interpreter::intrinsic_substr(Value *args, unsigned int num_args, const Location &loc) {
     if (num_args != 3)
         EvaluationError::raise(loc, "Wrong number of arguments passed to substr function");
     if (args[0].get_kind() != VALUE_STRING)
@@ -413,7 +413,7 @@ Value Interpreter::intrinsic_substr(Value *args, unsigned int num_args, const Lo
 }
 
 
-Value Interpreter::intrinsic_mkarr(Value args[], unsigned int num_args, const Location &loc, Interpreter * interp) {
+Value Interpreter::intrinsic_mkarr(Value args[], unsigned int num_args, const Location &loc) {
     Value arr = new Array();
     for (unsigned int i = 0; i < num_args; i++) {
         arr.get_array()->push(args[i]);
@@ -421,7 +421,7 @@ Value Interpreter::intrinsic_mkarr(Value args[], unsigned int num_args, const Lo
     return arr;
 }
 
-Value Interpreter::intrinsic_len(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
+Value Interpreter::intrinsic_len(Value *args, unsigned int num_args, const Location &loc) {
     if (num_args != 1)
         EvaluationError::raise(loc, "Wrong number of arguments to length check call");
     if (args[0].get_kind() != VALUE_ARRAY)
@@ -430,7 +430,7 @@ Value Interpreter::intrinsic_len(Value *args, unsigned int num_args, const Locat
     return args[0].get_array()->len();
 }
 
-Value Interpreter::intrinsic_get(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
+Value Interpreter::intrinsic_get(Value *args, unsigned int num_args, const Location &loc) {
     if (num_args != 2)
         EvaluationError::raise(loc, "Wrong number of arguments to array get call");
     if (args[0].get_kind() != VALUE_ARRAY)
@@ -441,7 +441,7 @@ Value Interpreter::intrinsic_get(Value *args, unsigned int num_args, const Locat
 
 }
 
-Value Interpreter::intrinsic_set(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
+Value Interpreter::intrinsic_set(Value *args, unsigned int num_args, const Location &loc) {
     if (num_args != 3)
         EvaluationError::raise(loc, "Wrong number of arguments to array set call");
     if (args[0].get_kind() != VALUE_ARRAY)
@@ -452,7 +452,7 @@ Value Interpreter::intrinsic_set(Value *args, unsigned int num_args, const Locat
     return args[2];
 }
 
-Value Interpreter::intrinsic_push(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
+Value Interpreter::intrinsic_push(Value *args, unsigned int num_args, const Location &loc) {
     if (num_args != 2)
         EvaluationError::raise(loc, "Wrong number of arguments to array push call");
     if (args[0].get_kind() != VALUE_ARRAY)
@@ -461,7 +461,7 @@ Value Interpreter::intrinsic_push(Value *args, unsigned int num_args, const Loca
     return args[1];
 }
 
-Value Interpreter::intrinsic_pop(Value *args, unsigned int num_args, const Location &loc, Interpreter *interp) {
+Value Interpreter::intrinsic_pop(Value *args, unsigned int num_args, const Location &loc) {
     if (num_args != 1)
         EvaluationError::raise(loc, "Wrong number of arguments to array pop call");
     if (args[0].get_kind() != VALUE_ARRAY)
@@ -482,7 +482,7 @@ Value Interpreter::call_intrinsic(Node *ast, Environment *env) {
 
     Value fn = get_variable(ast, env);
     IntrinsicFn fp = fn.get_intrinsic_fn();
-    return fp(args, arg_list->get_num_kids(), ast->get_loc(), this);
+    return fp(args, arg_list->get_num_kids(), ast->get_loc());
 }
 
 
