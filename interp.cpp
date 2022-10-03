@@ -22,8 +22,8 @@ Interpreter::~Interpreter() {
 }
 
 void Interpreter::analyze() {
-    //add_intrinsic(testing_env.get());
-    //search_for_semantic(m_ast, testing_env.get());
+    add_intrinsic(testing_env.get());
+    search_for_semantic(m_ast, testing_env.get());
 }
 
 void Interpreter::search_for_semantic(Node *ast, Environment*test_env) {
@@ -103,11 +103,11 @@ Value Interpreter::execute_prime(Node *ast, Environment *env) {
                     case VALUE_INTRINSIC_FN:
                         return call_intrinsic(ast, env);
                     case VALUE_FUNCTION: {
-                        // TODO: There is an issue with how scope si being deployed, effecting functions being called from another function.
                         // extract function from environment
                         Function * fn = get_variable(ast, env).get_function();
                         Environment func_env(fn->get_parent_env());
                         // bind the parameters to the arguments within the function scope
+                        // add local env as the execution env of the arguments
                         bind_params(fn, &func_env, env, ast->get_kid(0));
                         // execute the ast tree shard
                         return execute_prime(fn->get_body(),&func_env);
@@ -180,7 +180,7 @@ void Interpreter::bind_params(Function * fn, Environment * env, Environment *loc
 
     // bind all parameters to passed in values
     for (long unsigned int i = 0; i < params.size(); i++) {
-        //std::cout << "bind parameter " << params.at(i) << " in env " << static_cast<void*>(env) << std::endl;
+        // local env is where each argument is evaluated, env is where the params will be bound
         env->bind(params.at(i),arg_list->get_loc(), execute_prime(arg_list->get_kid(i), local_env));
     }
 }

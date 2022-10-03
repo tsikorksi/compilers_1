@@ -42,18 +42,16 @@ Value::Value(const Value &other)
 }
 
 Value::~Value() {
-    // TODO: handle reference counting (detach from ValRep, if any)
 }
 
 Value &Value::operator=(const Value &rhs) {
     if (this != &rhs &&
         !(is_dynamic() && rhs.is_dynamic() && m_rep == rhs.m_rep)) {
-        // TODO: handle reference counting (detach from previous ValRep, if any)
         m_kind = rhs.m_kind;
         if (is_dynamic()) {
             // attach to rhs's dynamic representation
             m_rep = rhs.m_rep;
-            // TODO: handle reference counting (attach to the new ValRep)
+            rhs.m_rep->add_ref();
         } else {
             // copy rhs's atomic representation
             m_atomic = rhs.m_atomic;
