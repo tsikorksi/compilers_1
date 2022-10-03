@@ -65,7 +65,7 @@
 
 
 Parser2::Parser2(Lexer *lexer_to_adopt)
-        : m_lexer(lexer_to_adopt), m_next(nullptr) {
+        : m_lexer(lexer_to_adopt), m_next() {
 }
 
 Parser2::~Parser2() {

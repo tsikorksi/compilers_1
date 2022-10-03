@@ -38,8 +38,7 @@ Value::Value(const Value &other)
     *this = other;
 }
 
-Value::~Value() {
-}
+Value::~Value() = default;
 
 Value &Value::operator=(const Value &rhs) {
     if (this != &rhs &&
@@ -49,6 +48,11 @@ Value &Value::operator=(const Value &rhs) {
             // attach to rhs's dynamic representation
             m_rep = rhs.m_rep;
             rhs.m_rep->add_ref();
+            if (m_rep->get_num_refs() != 0) {
+                m_rep->remove_ref();
+            } else {
+                delete m_rep;
+            }
         } else {
             // copy rhs's atomic representation
             m_atomic = rhs.m_atomic;

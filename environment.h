@@ -18,7 +18,7 @@ private:
     Environment &operator=(const Environment &);
 
 public:
-    Environment(Environment *parent = nullptr);
+    explicit Environment(Environment *parent = nullptr);
 
     ~Environment();
 
