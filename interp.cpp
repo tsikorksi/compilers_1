@@ -351,8 +351,7 @@ Value Interpreter::int_literal(Node * ast) {
 }
 
 Value Interpreter::string_literal(Node * ast) {
-    Value str = new String(ast->get_str());
-    return str;
+    return new String(ast->get_str());
 }
 
 

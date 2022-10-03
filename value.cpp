@@ -84,7 +84,9 @@ std::string Value::as_str() const {
             std::string out;
             out.push_back('[');
             for (int i = 0; i < m_rep->as_array()->len().get_ival() - 1; i++) {
-                out.push_back(m_rep->as_array()->get(i).as_str().at(0));
+                for (unsigned int j = 0; j < m_rep->as_array()->get(i).as_str().length(); j++){
+                    out.push_back(m_rep->as_array()->get(i).as_str().at(j));
+                }
                 out.push_back(',');
                 out.push_back(' ');
             }
