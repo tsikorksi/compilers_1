@@ -20,8 +20,6 @@ public:
   Environment(Environment *parent = nullptr);
   ~Environment();
 
-  // TODO: add member functions allowing lookup, definition, and assignment
-
     Value get_variable(const std::string& identifier, const Location &loc);
 
     void set_variable(const std::string &identifier, const Value &value, const Location &loc);

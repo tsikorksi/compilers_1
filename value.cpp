@@ -1,4 +1,3 @@
-#include <iostream>
 #include "cpputil.h"
 #include "exceptions.h"
 #include "valrep.h"
@@ -108,4 +107,3 @@ String *Value::get_string() const {
     return m_rep->as_string();
 }
 
-// TODO: implementations of additional member functions
