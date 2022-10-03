@@ -49,23 +49,7 @@ private:
     void check_condition(Node *ast, Environment *env);
 
 
-    // I/O
-    static Value intrinsic_println(Value *args, unsigned int num_args, const Location &loc);
-    static Value intrinsic_print(Value *args, unsigned int num_args, const Location &loc);
-    static Value intrinsic_readint(Value *args, unsigned int num_args, const Location &loc);
 
-    // Array funcs
-    static Value intrinsic_mkarr(Value *args, unsigned int num_args, const Location &loc);
-    static Value intrinsic_len(Value *args, unsigned int num_args, const Location &loc);
-    static Value intrinsic_get(Value *args, unsigned int num_args, const Location &loc);
-    static Value intrinsic_set(Value *args, unsigned int num_args, const Location &loc);
-    static Value intrinsic_push(Value *args, unsigned int num_args, const Location &loc);
-    static Value intrinsic_pop(Value *args, unsigned int num_args, const Location &loc);
-
-    // String funcs
-    static Value intrinsic_substr(Value *args, unsigned int num_args, const Location &loc);
-    static Value intrinsic_strcat(Value *args, unsigned int num_args, const Location &loc);
-    static Value intrinsic_strlen(Value *args, unsigned int num_args, const Location &loc);
 
     void bind_params(Function * fn, Environment * env, Environment *local_env, Node * arg_list);
 
