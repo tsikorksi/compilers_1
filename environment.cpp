@@ -2,15 +2,15 @@
 #include "exceptions.h"
 
 Environment::Environment(Environment *parent)
-  : m_parent(parent) {
-  assert(m_parent != this);
+        : m_parent(parent) {
+    assert(m_parent != this);
 }
 
 Environment::~Environment() = default;
 
 
 // Add new variable to environment
-void Environment::new_variable(const std::string& identifier, const Location &loc, const ValueKind kind) {
+void Environment::new_variable(const std::string &identifier, const Location &loc, const ValueKind kind) {
     if (Environment::variables.find(identifier) != Environment::variables.end()) {
         SemanticError::raise(loc, "Variable %s already exists", identifier.c_str());
     }
@@ -36,7 +36,7 @@ void Environment::set_variable(const std::string &identifier, const Value &value
 
 
 // Get value of variable from environment
-Value Environment::get_variable(const std::string& identifier, const Location &loc) {
+Value Environment::get_variable(const std::string &identifier, const Location &loc) {
 
     if (Environment::variables.find(identifier) == Environment::variables.end()) {
         if (m_parent == nullptr) {
@@ -48,7 +48,7 @@ Value Environment::get_variable(const std::string& identifier, const Location &l
     return Environment::variables[identifier];
 }
 
-void Environment::bind(const std::string& identifier, const Location &loc, const Value& value){
+void Environment::bind(const std::string &identifier, const Location &loc, const Value &value) {
     new_variable(identifier, loc, value.get_kind());
     set_variable(identifier, value, loc);
 }

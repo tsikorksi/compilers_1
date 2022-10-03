@@ -249,7 +249,7 @@ Node *Lexer::read_multi_greater(const std::string &lexeme, int line, int col) {
 Node *Lexer::read_multi_string(const std::string &lexeme, int line, int col) {
     int next_c = read();
     std::string word;
-    while (next_c != '"'){
+    while (next_c != '"') {
         if (next_c == '\\') {
             int next_next = read();
             switch (next_next) {

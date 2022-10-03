@@ -8,7 +8,7 @@
 Array::Array() : ValRep(VALREP_ARRAY) {
 }
 
-void Array::push(const Value& val) {
+void Array::push(const Value &val) {
     m_array.push_back(val);
 }
 
@@ -16,7 +16,7 @@ Value Array::len() const {
     return {static_cast<int>(m_array.size())};
 }
 
-Value Array::set(int index, const Value& val) {
+Value Array::set(int index, const Value &val) {
     m_array.at(index) = val;
     return m_array.at(index);
 }

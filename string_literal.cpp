@@ -7,7 +7,7 @@
 #include <utility>
 
 
-String::String() : ValRep(VALREP_STRING){
+String::String() : ValRep(VALREP_STRING) {
 
 }
 

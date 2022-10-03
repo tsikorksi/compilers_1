@@ -10,8 +10,8 @@
 #include "intrinsic.h"
 
 
-std::unique_ptr<Environment> testing_env (new Environment(nullptr));
-std::unique_ptr<Environment> global_env (new Environment(nullptr));
+std::unique_ptr<Environment> testing_env(new Environment(nullptr));
+std::unique_ptr<Environment> global_env(new Environment(nullptr));
 
 Interpreter::Interpreter(Node *ast_to_adopt)
         : m_ast(ast_to_adopt) {
@@ -26,7 +26,7 @@ void Interpreter::analyze() {
     search_for_semantic(m_ast, testing_env.get());
 }
 
-void Interpreter::search_for_semantic(Node *ast, Environment*test_env) {
+void Interpreter::search_for_semantic(Node *ast, Environment *test_env) {
     int tag = ast->get_tag();
 
     switch (tag) {
@@ -47,24 +47,24 @@ void Interpreter::search_for_semantic(Node *ast, Environment*test_env) {
 
 }
 
-void Interpreter::add_intrinsic(Environment * env) {
+void Interpreter::add_intrinsic(Environment *env) {
     // From intrinsic.cpp
     // Bind all intrinsic functions
     // I/O
-    env->bind("print",m_ast->get_loc() , IntrinsicFn (intrinsic_print));
-    env->bind("println",m_ast->get_loc() , IntrinsicFn (intrinsic_println));
-    env->bind("readint", m_ast->get_loc(), IntrinsicFn (intrinsic_readint));
+    env->bind("print", m_ast->get_loc(), IntrinsicFn(intrinsic_print));
+    env->bind("println", m_ast->get_loc(), IntrinsicFn(intrinsic_println));
+    env->bind("readint", m_ast->get_loc(), IntrinsicFn(intrinsic_readint));
     // Arrays
-    env->bind("mkarr", m_ast->get_loc(), IntrinsicFn (intrinsic_mkarr));
-    env->bind("len", m_ast->get_loc(), IntrinsicFn (intrinsic_len));
-    env->bind("get", m_ast->get_loc(), IntrinsicFn (intrinsic_get));
-    env->bind("set", m_ast->get_loc(), IntrinsicFn (intrinsic_set));
-    env->bind("pop", m_ast->get_loc(), IntrinsicFn (intrinsic_pop));
-    env->bind("push", m_ast->get_loc(), IntrinsicFn (intrinsic_push));
+    env->bind("mkarr", m_ast->get_loc(), IntrinsicFn(intrinsic_mkarr));
+    env->bind("len", m_ast->get_loc(), IntrinsicFn(intrinsic_len));
+    env->bind("get", m_ast->get_loc(), IntrinsicFn(intrinsic_get));
+    env->bind("set", m_ast->get_loc(), IntrinsicFn(intrinsic_set));
+    env->bind("pop", m_ast->get_loc(), IntrinsicFn(intrinsic_pop));
+    env->bind("push", m_ast->get_loc(), IntrinsicFn(intrinsic_push));
     // Strings
-    env->bind("strlen", m_ast->get_loc(), IntrinsicFn (intrinsic_strlen));
-    env->bind("strcat", m_ast->get_loc(), IntrinsicFn (intrinsic_strcat));
-    env->bind("substr", m_ast->get_loc(), IntrinsicFn (intrinsic_substr));
+    env->bind("strlen", m_ast->get_loc(), IntrinsicFn(intrinsic_strlen));
+    env->bind("strcat", m_ast->get_loc(), IntrinsicFn(intrinsic_strcat));
+    env->bind("substr", m_ast->get_loc(), IntrinsicFn(intrinsic_substr));
 }
 
 Value Interpreter::execute() {
@@ -76,8 +76,7 @@ Value Interpreter::execute_prime(Node *ast, Environment *env) {
     int tag = ast->get_tag();
 
     switch (ast->get_tag()) {
-        case AST_STATEMENT_LIST:
-        {
+        case AST_STATEMENT_LIST: {
             // enter new scope
             Environment new_env(env);
 
@@ -104,13 +103,13 @@ Value Interpreter::execute_prime(Node *ast, Environment *env) {
                         return call_intrinsic(ast, env);
                     case VALUE_FUNCTION: {
                         // extract function from environment
-                        Function * fn = get_variable(ast, env).get_function();
+                        Function *fn = get_variable(ast, env).get_function();
                         Environment func_env(fn->get_parent_env());
                         // bind the parameters to the arguments within the function scope
                         // add local env as the execution env of the arguments
                         bind_params(fn, &func_env, env, ast->get_kid(0));
                         // execute the ast tree shard
-                        return execute_prime(fn->get_body(),&func_env);
+                        return execute_prime(fn->get_body(), &func_env);
                     }
                     case VALUE_ARRAY:
                     case VALUE_STRING:
@@ -137,11 +136,11 @@ Value Interpreter::execute_prime(Node *ast, Environment *env) {
             return string_literal(ast);
         case AST_ASSIGN:
             return set_variable(ast->get_kid(0), execute_prime(ast->get_kid(1), env), env);
-        case AST_ARGLIST:{
-            EvaluationError::raise(ast->get_loc(),"Argument list made child of non function call");
+        case AST_ARGLIST: {
+            EvaluationError::raise(ast->get_loc(), "Argument list made child of non function call");
         }
-        case AST_PARAMETER_LIST:{
-            EvaluationError::raise(ast->get_loc(),"Parameter list made child of non function call");
+        case AST_PARAMETER_LIST: {
+            EvaluationError::raise(ast->get_loc(), "Parameter list made child of non function call");
         }
         case AST_AND:
         case AST_OR:
@@ -162,7 +161,7 @@ Value Interpreter::execute_prime(Node *ast, Environment *env) {
     }
 }
 
-Value Interpreter::execute_statement_list(Node* ast, Environment* env) {
+Value Interpreter::execute_statement_list(Node *ast, Environment *env) {
     Value final;
 
     for (unsigned i = 0; i < ast->get_num_kids(); i++) {
@@ -171,23 +170,23 @@ Value Interpreter::execute_statement_list(Node* ast, Environment* env) {
     return final;
 }
 
-void Interpreter::bind_params(Function * fn, Environment * env, Environment *local_env, Node * arg_list) {
+void Interpreter::bind_params(Function *fn, Environment *env, Environment *local_env, Node *arg_list) {
     std::vector<std::string> params = fn->get_params();
 
-    if (fn->get_params().size() != arg_list->get_num_kids()){
+    if (fn->get_params().size() != arg_list->get_num_kids()) {
         EvaluationError::raise(arg_list->get_loc(), "Wrong number of arguments to function %s", fn->get_name().c_str());
     }
 
     // bind all parameters to passed in values
     for (long unsigned int i = 0; i < params.size(); i++) {
         // local env is where each argument is evaluated, env is where the params will be bound
-        env->bind(params.at(i),arg_list->get_loc(), execute_prime(arg_list->get_kid(i), local_env));
+        env->bind(params.at(i), arg_list->get_loc(), execute_prime(arg_list->get_kid(i), local_env));
     }
 }
 
 void Interpreter::try_if(Node *ast, Environment *env) {
     check_condition(ast, env);
-    if (execute_prime(ast->get_kid(0), env).get_ival()){
+    if (execute_prime(ast->get_kid(0), env).get_ival()) {
         execute_prime(ast->get_kid(1), env);
 
     } else {
@@ -210,7 +209,7 @@ void Interpreter::try_while(Node *ast, Environment *env) {
     }
 }
 
-void Interpreter::check_condition(Node * ast, Environment *env) {
+void Interpreter::check_condition(Node *ast, Environment *env) {
 
     Value kind = execute_prime(ast->get_kid(0), env);
     // check we are using an int as a condition
@@ -260,7 +259,7 @@ Value Interpreter::do_math(Node *ast, Environment *env) {
             if (rhs == 0) {
                 EvaluationError::raise(ast->get_loc(), "Divide by 0");
             }
-            return{lhs / rhs};
+            return {lhs / rhs};
         default:
             EvaluationError::raise(ast->get_loc(), "Invalid math for operator %s", ast->get_str().c_str());
     }
@@ -272,8 +271,8 @@ Value Interpreter::binary_op(Node *ast, Environment *env) {
     Value lhs_val = execute_prime(ast->get_kid(0), env);
 
     // check something weird isn't being passed in
-    if (!lhs_val.is_numeric()){
-        EvaluationError::raise(ast->get_loc(),"%s passed into binary operation", lhs_val.as_str().c_str());
+    if (!lhs_val.is_numeric()) {
+        EvaluationError::raise(ast->get_loc(), "%s passed into binary operation", lhs_val.as_str().c_str());
     }
     int lhs = lhs_val.get_ival();
 
@@ -296,8 +295,8 @@ Value Interpreter::binary_op(Node *ast, Environment *env) {
     Value rhs_val = execute_prime(ast->get_kid(1), env);
 
     // check something weird isn't being passed in
-    if (!rhs_val.is_numeric()){
-        EvaluationError::raise(ast->get_loc(),"%s passed into binary operation", rhs_val.as_str().c_str());
+    if (!rhs_val.is_numeric()) {
+        EvaluationError::raise(ast->get_loc(), "%s passed into binary operation", rhs_val.as_str().c_str());
     }
     int rhs = rhs_val.get_ival();
 
@@ -348,11 +347,11 @@ Value Interpreter::binary_op(Node *ast, Environment *env) {
     return {0};
 }
 
-Value Interpreter::int_literal(Node * ast) {
+Value Interpreter::int_literal(Node *ast) {
     return {std::stoi(ast->get_str())};
 }
 
-Value Interpreter::string_literal(Node * ast) {
+Value Interpreter::string_literal(Node *ast) {
     return new String(ast->get_str());
 }
 
@@ -360,7 +359,7 @@ Value Interpreter::string_literal(Node * ast) {
 Value Interpreter::call_intrinsic(Node *ast, Environment *env) {
 
     std::string name = ast->get_str();
-    Node * arg_list = ast->get_kid(0);
+    Node *arg_list = ast->get_kid(0);
     Value args[arg_list->get_num_kids()];
 
     for (unsigned i = 0; i < arg_list->get_num_kids(); i++) {

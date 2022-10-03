@@ -12,8 +12,7 @@ Value::Value(int ival)
 }
 
 Value::Value(Function *fn)
-        : m_kind(VALUE_FUNCTION)
-        , m_rep(fn) {
+        : m_kind(VALUE_FUNCTION), m_rep(fn) {
     m_rep = fn;
 }
 
@@ -23,14 +22,12 @@ Value::Value(IntrinsicFn intrinsic_fn)
 }
 
 Value::Value(Array *ar)
-        : m_kind(VALUE_ARRAY)
-        , m_rep(ar) {
+        : m_kind(VALUE_ARRAY), m_rep(ar) {
     m_rep = ar;
 }
 
 Value::Value(String *st)
-        : m_kind(VALUE_STRING)
-        , m_rep(st) {
+        : m_kind(VALUE_STRING), m_rep(st) {
     m_rep = st;
 }
 

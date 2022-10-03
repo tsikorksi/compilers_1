@@ -10,16 +10,21 @@
 #include <vector>
 
 
-class Array : public ValRep{
+class Array : public ValRep {
 private:
 
     std::vector<Value> m_array;
 public:
     explicit Array();
+
     Value len() const;
+
     void push(const Value &val);
-    Value set(int index, const Value& val);
+
+    Value set(int index, const Value &val);
+
     Value get(int index);
+
     Value pop();
 };
 

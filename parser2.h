@@ -12,6 +12,7 @@ private:
 
 public:
     Parser2(Lexer *lexer_to_adopt);
+
     ~Parser2();
 
     Node *parse();
@@ -19,13 +20,21 @@ public:
 private:
     // Parse functions for nonterminal grammar symbols
     Node *parse_Unit();
+
     Node *parse_Stmt();
+
     Node *parse_TStmt();
+
     Node *parse_E();
+
     Node *parse_EPrime(Node *ast);
+
     Node *parse_T();
+
     Node *parse_TPrime(Node *ast);
+
     Node *parse_F();
+
     Node *parse_Func();
 
 
@@ -41,37 +50,45 @@ private:
     // Parse functions for Math
 
     Node *parse_L();
+
     Node *parse_A();
+
     Node *parse_R();
 
     // Parse functions for terminals
 
     Node *parse_ident();
+
     Node *parse_var();
+
     Node *parse_if();
+
     Node *parse_while();
+
     Node *parse_assign();
 
 
     // Parse functions for Lists
 
     Node *parse_OptPList();
+
     Node *parse_PList();
 
     // Parse functions for functions
 
     Node *parse_OptArgList();
+
     Node *parse_ArgList(Node *arg_list_);
+
     Node *parse_function();
+
     Node *parse_SList();
 
 
     // Helper function
     ASTKind tok_to_ast(TokenKind tag);
+
     static bool valid_operand(int tok);
-
-
-
 
 
 };

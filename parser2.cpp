@@ -100,7 +100,7 @@ Node *Parser2::parse_TStmt() {
     if (next_tok == nullptr) {
         SyntaxError::raise(m_lexer->get_current_loc(), "Unexpected end of input looking for statement");
 
-    } else if (next_tok->get_tag() ==  TOK_FN) {
+    } else if (next_tok->get_tag() == TOK_FN) {
         //TStmt →      Func
         return parse_Func();
     }
@@ -138,7 +138,7 @@ Node *Parser2::parse_Stmt() {
         // Stmt →      ^ if ( A ) { SList }                        -- if statement
         // Stmt →      ^ if ( A ) { SList } else { SList }         -- if/else statement
         // Stmt →      ^ while ( A ) { SList }                     -- while loop
-        Node * ast;
+        Node *ast;
         if (tag == TOK_IF) {
             // Stmt →      ^ if ( A ) { SList }
             ast = parse_if();
@@ -184,7 +184,7 @@ Node *Parser2::parse_Stmt() {
 Node *Parser2::parse_Func() {
     // Func →       function ident ( OptPList ) { SList }     -- function definition
 
-    Node * func_ast = parse_function();
+    Node *func_ast = parse_function();
     func_ast->append_kid(parse_ident());
 
     expect_and_discard(TOK_LPAREN);
@@ -600,8 +600,7 @@ Node *Parser2::expect(enum TokenKind tok_kind) {
     std::unique_ptr<Node> next_terminal(m_lexer->next());
     if (next_terminal == nullptr) {
         SyntaxError::raise(next_terminal->get_loc(), "Unexpected end of input, wanted %u", tok_kind);
-    }
-    else if (next_terminal->get_tag() != tok_kind) {
+    } else if (next_terminal->get_tag() != tok_kind) {
         SyntaxError::raise(next_terminal->get_loc(), "Unexpected token '%s'", next_terminal->get_str().c_str());
     }
 

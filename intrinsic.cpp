@@ -28,8 +28,8 @@ Value intrinsic_readint(Value args[], unsigned int num_args, const Location &loc
     int input = 0;
     int result = scanf("%i", &input);
     if (result == 0) {
-        EvaluationError::raise(loc,"No input detected");
-    } else if (result  == EOF) {
+        EvaluationError::raise(loc, "No input detected");
+    } else if (result == EOF) {
         EvaluationError::raise(loc, "Unexpected End Of File");
     }
     return {input};

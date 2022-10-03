@@ -3,7 +3,9 @@
 
 #include "value.h"
 #include "environment.h"
+
 class Node;
+
 class Location;
 
 class Interpreter {
@@ -12,9 +14,11 @@ private:
 
 public:
     explicit Interpreter(Node *ast_to_adopt);
+
     ~Interpreter();
 
     void analyze();
+
     Value execute();
 
 private:
@@ -42,16 +46,14 @@ private:
 
     Value call_intrinsic(Node *ast, Environment *env);
 
-    void add_intrinsic(Environment * env);
+    void add_intrinsic(Environment *env);
 
     Value execute_statement_list(Node *ast, Environment *env);
 
     void check_condition(Node *ast, Environment *env);
 
 
-
-
-    void bind_params(Function * fn, Environment * env, Environment *local_env, Node * arg_list);
+    void bind_params(Function *fn, Environment *env, Environment *local_env, Node *arg_list);
 
 
     static Value string_literal(Node *ast);

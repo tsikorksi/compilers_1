@@ -4,7 +4,9 @@
 #include <cassert>
 
 class Function;
+
 class Array;
+
 class String;
 
 
@@ -27,6 +29,7 @@ private:
 
     // copy constructor and assignment operator prohibited
     ValRep(const ValRep &);
+
     ValRep &operator=(const ValRep &);
 
 public:
@@ -46,8 +49,13 @@ public:
     // (as returned by get_num_refs()) becomes 0, the ValRep object
     // should be deleted (because there are no longer any Value
     // objects pointing to it.)
-    void add_ref()           { ++m_refcount; }
-    void remove_ref()        { assert(m_refcount > 0); --m_refcount; }
+    void add_ref() { ++m_refcount; }
+
+    void remove_ref() {
+        assert(m_refcount > 0);
+        --m_refcount;
+    }
+
     int get_num_refs() const { return m_refcount; }
 
     // It's useful to have functions that return a pointer to

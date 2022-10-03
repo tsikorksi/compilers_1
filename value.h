@@ -3,39 +3,46 @@
 
 #include <cassert>
 #include <string>
+
 class ValRep;
+
 class Function;
+
 class Array;
+
 class String;
 
 
 enum ValueKind {
-  // "atomic" values
-  VALUE_INT,
-  VALUE_INTRINSIC_FN,
-  // could other kinds of atomic values here
+    // "atomic" values
+    VALUE_INT,
+    VALUE_INTRINSIC_FN,
+    // could other kinds of atomic values here
 
-  // dynamic values: these have an associated dynamically-allocated
-  // object (derived from ValRep)
-  VALUE_FUNCTION,
-  VALUE_ARRAY,
-  VALUE_STRING
-  // could add other kinds of dynamic values here
+    // dynamic values: these have an associated dynamically-allocated
+    // object (derived from ValRep)
+    VALUE_FUNCTION,
+    VALUE_ARRAY,
+    VALUE_STRING
+    // could add other kinds of dynamic values here
 };
 
 // Typedef of the signature of an intrinsic function.
 // Any information that intrinsic functions will need
 // should be passed as parameters.
 class Value;
+
 class Location;
+
 class Interpreter;
+
 typedef Value (*IntrinsicFn)(Value args[], unsigned num_args, const Location &loc);
 
 // An "atomic" value that doesn't require a separate
 // (dynamically-allocated) representation
 union Atomic {
-  int ival;
-  IntrinsicFn intrinsic_fn;
+    int ival;
+    IntrinsicFn intrinsic_fn;
 };
 
 // An instance of Value is a runtime value.
@@ -44,48 +51,58 @@ union Atomic {
 class Value {
 private:
     ValueKind m_kind;
-  union {
-    Atomic m_atomic; // for "atomic" values
-    ValRep *m_rep;   // for "dynamic" values (pointer to associated ValRep object)
-  };
+    union {
+        Atomic m_atomic; // for "atomic" values
+        ValRep *m_rep;   // for "dynamic" values (pointer to associated ValRep object)
+    };
 
 public:
-  Value(int ival = 0);
-  Value(Function *fn);
-  Value(Array *ar);
-  Value(String *st);
-  Value(IntrinsicFn intrinsic_fn);
-  Value(const Value &other);
-  ~Value();
+    Value(int ival = 0);
 
-  Value &operator=(const Value &rhs);
+    Value(Function *fn);
 
-  ValueKind get_kind() const { return m_kind; }
+    Value(Array *ar);
 
-  // Getters to extract the contents of a Value.
-  // The caller should use get_kind() first to determine
-  // what kind of data the Value is storing.
+    Value(String *st);
 
-  int get_ival() const {
-    assert(m_kind == VALUE_INT);
-    return m_atomic.ival;
-  }
+    Value(IntrinsicFn intrinsic_fn);
 
-  Function *get_function() const;
-  Array *get_array() const;
-  String *get_string() const;
+    Value(const Value &other);
 
-  IntrinsicFn get_intrinsic_fn() const {
-    assert(m_kind == VALUE_INTRINSIC_FN);
-    return m_atomic.intrinsic_fn;
-  }
+    ~Value();
 
-  // convert to a string representation
-  std::string as_str() const;
+    Value &operator=(const Value &rhs);
 
-  bool is_numeric() const { return m_kind == VALUE_INT; }
-  bool is_dynamic() const { return m_kind >= VALUE_FUNCTION; }
-  bool is_atomic() const  { return !is_dynamic(); }
+    ValueKind get_kind() const { return m_kind; }
+
+    // Getters to extract the contents of a Value.
+    // The caller should use get_kind() first to determine
+    // what kind of data the Value is storing.
+
+    int get_ival() const {
+        assert(m_kind == VALUE_INT);
+        return m_atomic.ival;
+    }
+
+    Function *get_function() const;
+
+    Array *get_array() const;
+
+    String *get_string() const;
+
+    IntrinsicFn get_intrinsic_fn() const {
+        assert(m_kind == VALUE_INTRINSIC_FN);
+        return m_atomic.intrinsic_fn;
+    }
+
+    // convert to a string representation
+    std::string as_str() const;
+
+    bool is_numeric() const { return m_kind == VALUE_INT; }
+
+    bool is_dynamic() const { return m_kind >= VALUE_FUNCTION; }
+
+    bool is_atomic() const { return !is_dynamic(); }
 
 private:
 };

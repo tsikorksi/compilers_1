@@ -9,18 +9,20 @@
 
 class Environment {
 private:
-  Environment *m_parent;
-  std::map<std::string, Value> variables;
+    Environment *m_parent;
+    std::map<std::string, Value> variables;
 
-  // copy constructor and assignment operator prohibited
-  Environment(const Environment &);
-  Environment &operator=(const Environment &);
+    // copy constructor and assignment operator prohibited
+    Environment(const Environment &);
+
+    Environment &operator=(const Environment &);
 
 public:
-  Environment(Environment *parent = nullptr);
-  ~Environment();
+    Environment(Environment *parent = nullptr);
 
-    Value get_variable(const std::string& identifier, const Location &loc);
+    ~Environment();
+
+    Value get_variable(const std::string &identifier, const Location &loc);
 
     void set_variable(const std::string &identifier, const Value &value, const Location &loc);
 
