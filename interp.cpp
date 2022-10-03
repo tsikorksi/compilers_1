@@ -48,6 +48,7 @@ void Interpreter::search_for_semantic(Node *ast, Environment*test_env) {
 }
 
 void Interpreter::add_intrinsic(Environment * env) {
+    // From intrinsic.cpp
     // Bind all intrinsic functions
     // I/O
     env->bind("print",m_ast->get_loc() , IntrinsicFn (intrinsic_print));
