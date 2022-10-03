@@ -4,6 +4,7 @@
 
 #include "string_literal.h"
 #include <string>
+#include <utility>
 
 
 String::String() : ValRep(VALREP_STRING){
@@ -11,7 +12,7 @@ String::String() : ValRep(VALREP_STRING){
 }
 
 String::String(std::string in) : ValRep(VALREP_STRING) {
-    m_string = in;
+    m_string = std::move(in);
 }
 
 Value String::len() const {
@@ -23,7 +24,7 @@ std::string String::get_str() {
 }
 
 void String::set_str(std::string in) {
-    m_string = in;
+    m_string = std::move(in);
 }
 
 void String::set_str(String in) {
