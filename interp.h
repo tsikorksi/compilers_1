@@ -67,7 +67,7 @@ private:
     static Value intrinsic_strcat(Value *args, unsigned int num_args, const Location &loc);
     static Value intrinsic_strlen(Value *args, unsigned int num_args, const Location &loc);
 
-    void bind_params(Function * fn, Environment * env, Node * arg_list);
+    void bind_params(Function * fn, Environment * env, Environment *local_env, Node * arg_list);
 
 
     static Value string_literal(Node *ast);

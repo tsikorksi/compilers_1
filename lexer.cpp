@@ -87,8 +87,7 @@ void Lexer::fill(int how_many) {
     }
 }
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "UnreachableCode"
+
 Node *Lexer::read_token() {
     int c, line = -1, col = -1;
 
@@ -167,7 +166,6 @@ Node *Lexer::read_token() {
         }
     }
 }
-#pragma clang diagnostic pop
 
 // Helper function to create a Node object to represent a token.
 Node *Lexer::token_create(enum TokenKind kind, const std::string &lexeme, int line, int col) {

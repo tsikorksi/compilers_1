@@ -22,8 +22,8 @@ Interpreter::~Interpreter() {
 }
 
 void Interpreter::analyze() {
-    add_intrinsic(testing_env.get());
-    search_for_semantic(m_ast, testing_env.get());
+    //add_intrinsic(testing_env.get());
+    //search_for_semantic(m_ast, testing_env.get());
 }
 
 void Interpreter::search_for_semantic(Node *ast, Environment*test_env) {
@@ -48,6 +48,7 @@ void Interpreter::search_for_semantic(Node *ast, Environment*test_env) {
 }
 
 void Interpreter::add_intrinsic(Environment * env) {
+    // TODO: move intrinsic functions to separate file
     // Bind all intrinsic functions
     // I/O
     env->bind("print",m_ast->get_loc() , IntrinsicFn (intrinsic_print));
@@ -107,7 +108,7 @@ Value Interpreter::execute_prime(Node *ast, Environment *env) {
                         Function * fn = get_variable(ast, env).get_function();
                         Environment func_env(fn->get_parent_env());
                         // bind the parameters to the arguments within the function scope
-                        bind_params(fn, env, ast->get_kid(0));
+                        bind_params(fn, &func_env, env, ast->get_kid(0));
                         // execute the ast tree shard
                         return execute_prime(fn->get_body(),&func_env);
                     }
@@ -170,7 +171,7 @@ Value Interpreter::execute_statement_list(Node* ast, Environment* env) {
     return final;
 }
 
-void Interpreter::bind_params(Function * fn, Environment * env, Node * arg_list) {
+void Interpreter::bind_params(Function * fn, Environment * env, Environment *local_env, Node * arg_list) {
     std::vector<std::string> params = fn->get_params();
 
     if (fn->get_params().size() != arg_list->get_num_kids()){
@@ -179,7 +180,8 @@ void Interpreter::bind_params(Function * fn, Environment * env, Node * arg_list)
 
     // bind all parameters to passed in values
     for (long unsigned int i = 0; i < params.size(); i++) {
-        env->bind(params.at(i),arg_list->get_loc(), execute_prime(arg_list->get_kid(i), env));
+        //std::cout << "bind parameter " << params.at(i) << " in env " << static_cast<void*>(env) << std::endl;
+        env->bind(params.at(i),arg_list->get_loc(), execute_prime(arg_list->get_kid(i), local_env));
     }
 }
 
